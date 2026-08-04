@@ -128,6 +128,9 @@ class ProfileController {
   updateMyProfile = asyncHandler(async (req, res) => {
     const { name, about, phone, height, weight } = req.body;
 
+    console.log("📁 req.files:", req.files); // شوف الملفات وصلت؟
+    console.log("📝 req.body:", req.body);
+
     const user = await User.findById(req.user.id);
     if (!user) {
       const resp = error('User not found', 404);
@@ -135,42 +138,33 @@ class ProfileController {
     }
 
     if (name !== undefined) user.name = name;
-    if (about !== undefined) user.bio = about; // حفظ الـ about في حقل bio الموجود بقاعدة البيانات
+    if (about !== undefined) user.bio = about;
     if (phone !== undefined) user.phone = phone;
     if (height !== undefined) user.height = height;
     if (weight !== undefined) user.weight = weight;
 
-    // معالجة الصور المرفوعة عبر Multer بشكل آمن وتجنب تخزين undefined
+    // معالجة الصور
     if (req.files) {
       if (req.files.avatar && req.files.avatar[0]) {
-        user.avatar = req.files.avatar[0].path || req.files.avatar[0].secure_url || req.files.avatar[0].filename;
+        console.log("✅ Avatar file received:", req.files.avatar[0]);
+        user.avatar = req.files.avatar[0].path || req.files.avatar[0].secure_url;
       }
-      // إذا لم يُرسلavatar جديد، لا نقوم بتعديل user.avatar لتبقى القديمة كما هي
-
       if (req.files.cover && req.files.cover[0]) {
-        user.cover = req.files.cover[0].path || req.files.cover[0].secure_url || req.files.cover[0].filename;
+        console.log("✅ Cover file received:", req.files.cover[0]);
+        user.cover = req.files.cover[0].path || req.files.cover[0].secure_url;
       }
-      // إذا لم يُرسل cover جديد، لا نقوم بتعديل user.cover لتبقى القديمة كما هي
     }
 
     await user.save();
-
-    await createLog({
-      userId: req.user.id,
-      role: req.user.role,
-      action: 'UPDATE_PROFILE',
-      details: 'User updated their profile and/or pictures',
-    });
-
-    logger.info('Profile updated', { userId: req.user.id });
+    console.log("💾 User saved:", user); // تأكد الحفظ
 
     const resp = success(
       {
         name: user.name,
         about: user.bio,
         phone: user.phone,
-        avatar: user.avatar,
-        cover: user.cover,
+        avatar: user.avatar,  // ✅ تأكد بترجع
+        cover: user.cover,    // ✅ تأكد بترجع
         height: user.height,
         weight: user.weight,
       },
