@@ -1,0 +1,147 @@
+{"level":"warn","message":"User rollback بسبب خطأ بعد الإنشاء","timestamp":"2026-05-06 11:15:57"}
+{"level":"warn","message":"User rollback بسبب خطأ بعد الإنشاء","timestamp":"2026-05-06 11:33:38"}
+{"level":"warn","message":"Email failed but user created","timestamp":"2026-05-06 11:39:21"}
+{"level":"info","message":"User registered","timestamp":"2026-05-06 11:39:21","userId":"69fafe3801762a1a6053b603"}
+{"level":"warn","message":"Email failed but user created","timestamp":"2026-05-06 11:46:41"}
+{"level":"info","message":"User registered","timestamp":"2026-05-06 11:46:41","userId":"69fafff169f06a30a66f99ae"}
+{"level":"warn","message":"Email failed but user created","timestamp":"2026-05-06 11:48:23"}
+{"level":"info","message":"User registered","timestamp":"2026-05-06 11:48:23","userId":"69fb00570a1aa1bcc5c10eae"}
+{"level":"warn","message":"Email failed but user created","timestamp":"2026-05-06 11:49:50"}
+{"level":"info","message":"User registered","timestamp":"2026-05-06 11:49:50","userId":"69fb00ad644e58debeb5a82a"}
+{"level":"info","message":"User registered","timestamp":"2026-05-06 11:51:35","userId":"69fb010330604ef3d8bce647"}
+{"level":"info","message":"User registered","timestamp":"2026-05-06 11:54:47","userId":"69fb01c02f1152851295a349"}
+{"level":"info","message":"Email verified","timestamp":"2026-05-06 11:55:52","userId":"69fb01c02f1152851295a349"}
+{"level":"warn","message":"Email failed but user created","timestamp":"2026-05-06 12:06:50"}
+{"level":"info","message":"User registered","timestamp":"2026-05-06 12:06:50","userId":"69fb04aa6667b84729df5d01"}
+{"level":"info","message":"User registered","timestamp":"2026-05-06 12:12:19","userId":"69fb05eaf01c1b373266c49b"}
+{"level":"info","message":"User registered","timestamp":"2026-05-06 12:16:54","userId":"69fb06fb41f9a71ee7ece295"}
+{"level":"info","message":"User registered","timestamp":"2026-05-06 12:21:33","userId":"69fb08129218ab09b6598c7d"}
+{"level":"info","message":"User registered","timestamp":"2026-05-06 12:24:48","userId":"69fb08c74749550f01b67f2c"}
+{"level":"info","message":"User registered","timestamp":"2026-05-06 12:32:53","userId":"69fb0ac2e0136a35db8ba1e0"}
+{"level":"info","message":"User registered","timestamp":"2026-05-06 12:35:40","userId":"69fb0b4ff5f9646e1b75291f"}
+{"level":"info","message":"Email verified","timestamp":"2026-05-06 12:36:12","userId":"69fb0b4ff5f9646e1b75291f"}
+{"level":"info","message":"Password reset requested","resetLink":"http://localhost:8000/reset-password/f4c564b8bd316180b178eed6ce565127e2b66195691a2112573582c08950c27e","timestamp":"2026-05-06 12:40:58","userId":"69fb0b4ff5f9646e1b75291f"}
+{"level":"info","message":"Password reset requested","resetLink":"http://localhost:8000/reset-password/d3bac966210bef117643ab90929a81c41e00ba7e4c9054e2e6736f2d3095c106","timestamp":"2026-05-06 12:45:18","userId":"69fb0b4ff5f9646e1b75291f"}
+{"level":"info","message":"Password reset completed","timestamp":"2026-05-06 12:49:21","userId":"69fb0b4ff5f9646e1b75291f"}
+{"level":"info","message":"Password reset requested","resetLink":"http://localhost:8000/reset-password/d89b4a25a0bc8567e41208e239e672230b273772f01fb66e54cc47e1065a6981","timestamp":"2026-05-13 10:15:03","userId":"69fb0b4ff5f9646e1b75291f"}
+{"level":"info","message":"Password reset completed","timestamp":"2026-05-13 10:22:29","userId":"69fb0b4ff5f9646e1b75291f"}
+{"level":"info","message":"Password reset requested","resetLink":"http://localhost:8000/api/auth/reset-password/5e8c48ac197b81b23fcfb722bb076e2bb626b94729fc4c2f6c23efd9b37771f9","timestamp":"2026-05-13 10:25:13","userId":"69fb0b4ff5f9646e1b75291f"}
+{"level":"info","message":"Password reset completed","timestamp":"2026-05-13 10:28:56","userId":"69fb0b4ff5f9646e1b75291f"}
+{"level":"info","message":"User registered","timestamp":"2026-05-13 10:57:45","userId":"6a042ed938fbb40bcdfd9108"}
+{"level":"info","message":"Email verified","timestamp":"2026-05-13 11:01:54","userId":"6a042ed938fbb40bcdfd9108"}
+{"level":"warn","message":"User locked: blackmj123@gmail.com","timestamp":"2026-05-13 11:05:18"}
+{"level":"info","message":"Password updated","timestamp":"2026-05-13 11:25:43","userId":"69fb0b4ff5f9646e1b75291f"}
+{"level":"info","message":"User registered","timestamp":"2026-05-13 11:41:58","userId":"6a043953047f70a10bd3951a"}
+{"level":"info","message":"User registered","timestamp":"2026-05-13 11:44:12","userId":"6a0439c3498c20cf70a2a24e"}
+{"level":"info","message":"User auto-unlocked after lock expiration: blackmj123@gmail.com","timestamp":"2026-05-14 11:39:02"}
+{"level":"info","message":"User registered","timestamp":"2026-05-25 10:09:41","userId":"6a13f5b29a40b8f50e5fe14d"}
+{"level":"info","message":"User registered","timestamp":"2026-05-25 10:15:01","userId":"6a13f6f2979b4992c087d45d"}
+{"level":"info","message":"User registered","timestamp":"2026-05-25 10:27:46","userId":"6a13f9dada5576c960bbf9c3"}
+{"level":"info","message":"Email verified","timestamp":"2026-05-25 10:30:29","userId":"6a13f9dada5576c960bbf9c3"}
+{"level":"info","message":"User registered","timestamp":"2026-05-25 10:39:38","userId":"6a13fcb1410371982246bd1f"}
+{"level":"info","message":"Email verified","timestamp":"2026-05-25 10:40:25","userId":"6a13fcb1410371982246bd1f"}
+{"level":"info","message":"Plan created","planId":"6a13feecdd7aa33dd377be65","publisherId":"6a13fcb1410371982246bd1f","timestamp":"2026-05-25 10:49:00"}
+{"adminId":"6a13fcb1410371982246bd1f","level":"info","message":"Sport updated","sportId":"6a05892edd3b7c0a1d21720e","timestamp":"2026-05-25 11:26:11"}
+{"level":"info","message":"User registered","timestamp":"2026-05-25 12:27:38","userId":"6a1415fddbae5d705c114396"}
+{"level":"info","message":"Plan created","planId":"6a1d331d0263912acd0dda90","publisherId":"6a13fcb1410371982246bd1f","timestamp":"2026-06-01 10:22:05"}
+{"level":"info","message":"Post created","postId":"6a1d3c3e9586d5926715d1f2","timestamp":"2026-06-01 11:01:02","userId":"6a13fcb1410371982246bd1f"}
+{"level":"info","message":"Post created","postId":"6a1fd15d5d905e80d27804a4","timestamp":"2026-06-03 10:01:49","userId":"6a13fcb1410371982246bd1f"}
+{"level":"info","message":"Profile updated","timestamp":"2026-06-03 10:40:17","userId":"6a13fcb1410371982246bd1f"}
+{"level":"info","message":"User registered","timestamp":"2026-06-03 11:59:20","userId":"6a1feca9c0bac84ce6eaa944"}
+{"level":"info","message":"User registered","timestamp":"2026-06-03 12:03:36","userId":"6a1fede51ad71b34f487c087"}
+{"level":"info","message":"Email verified","timestamp":"2026-06-03 12:04:51","userId":"6a1fede51ad71b34f487c087"}
+{"level":"info","message":"Progress added","metric":"weight","publisherId":"6a13fcb1410371982246bd1f","timestamp":"2026-06-04 10:50:53","traineeId":"6a1fede51ad71b34f487c087","value":85}
+{"level":"info","message":"Progress added","metric":"weight","publisherId":"6a13fcb1410371982246bd1f","timestamp":"2026-06-04 10:55:48","traineeId":"6a1fede51ad71b34f487c087","value":85}
+{"level":"info","message":"User registered","timestamp":"2026-06-04 11:34:38","userId":"6a2138996c38366890228023"}
+{"level":"info","message":"User registered","timestamp":"2026-06-04 11:38:35","userId":"6a2139806c38366890228025"}
+{"level":"info","message":"User registered","timestamp":"2026-06-04 11:39:22","userId":"6a2139a06c38366890228027"}
+{"level":"info","message":"Email verified","timestamp":"2026-06-04 11:40:20","userId":"6a2139a06c38366890228027"}
+{"level":"info","message":"Profile updated","timestamp":"2026-06-04 11:43:56","userId":"6a1fede51ad71b34f487c087"}
+{"adminId":"6a13fcb1410371982246bd1f","level":"info","message":"Sport updated","sportId":"6a05892edd3b7c0a1d217210","timestamp":"2026-06-08 11:20:39"}
+{"adminId":"6a13fcb1410371982246bd1f","level":"info","message":"Sport updated","sportId":"6a05892edd3b7c0a1d217210","timestamp":"2026-06-08 11:21:31"}
+{"level":"info","message":"Plan created","planId":"6a267dc8500ef55b9b98b7cc","publisherId":"6a13fcb1410371982246bd1f","timestamp":"2026-06-08 11:31:04"}
+{"level":"info","message":"Plan created","planId":"6a267e93500ef55b9b98b7ce","publisherId":"6a13fcb1410371982246bd1f","timestamp":"2026-06-08 11:34:27"}
+{"level":"info","message":"Post created","postId":"6a267ffe500ef55b9b98b7d1","timestamp":"2026-06-08 11:40:30","userId":"6a13fcb1410371982246bd1f"}
+{"level":"info","message":"Post created","postId":"6a268048500ef55b9b98b7d3","timestamp":"2026-06-08 11:41:44","userId":"6a13fcb1410371982246bd1f"}
+{"level":"info","message":"Post created","postId":"6a268066500ef55b9b98b7d5","timestamp":"2026-06-08 11:42:14","userId":"6a13fcb1410371982246bd1f"}
+{"level":"info","message":"Post created","postId":"6a268067500ef55b9b98b7d7","timestamp":"2026-06-08 11:42:15","userId":"6a13fcb1410371982246bd1f"}
+{"level":"info","message":"Plan created","planId":"6a2681a9500ef55b9b98b7da","publisherId":"6a13fcb1410371982246bd1f","timestamp":"2026-06-08 11:47:37"}
+{"level":"info","message":"Plan created","planId":"6a2681ab500ef55b9b98b7dc","publisherId":"6a13fcb1410371982246bd1f","timestamp":"2026-06-08 11:47:39"}
+{"level":"info","message":"Plan created","planId":"6a2681ac500ef55b9b98b7de","publisherId":"6a13fcb1410371982246bd1f","timestamp":"2026-06-08 11:47:40"}
+{"level":"info","message":"Profile updated","timestamp":"2026-06-08 12:17:41","userId":"6a13fcb1410371982246bd1f"}
+{"athleteId":"6a1fede51ad71b34f487c087","coachId":"6a13fcb1410371982246bd1f","level":"info","message":"Training request sent","timestamp":"2026-06-10 10:31:22"}
+{"athleteId":"6a1fede51ad71b34f487c087","coachId":"6a13fcb1410371982246bd1f","level":"info","message":"Training request accepted","requestId":"6a2912ca11e50d2d55674f9a","timestamp":"2026-06-10 10:46:23"}
+{"athleteId":"6a1fede51ad71b34f487c087","coachId":"6a13fcb1410371982246bd1f","level":"info","message":"Training request sent","timestamp":"2026-06-10 10:52:56"}
+{"athleteId":"6a1fede51ad71b34f487c087","coachId":"6a13fcb1410371982246bd1f","level":"info","message":"Training request rejected","requestId":"6a2917d811e50d2d55674f9f","timestamp":"2026-06-10 10:55:04"}
+{"athleteId":"6a1fede51ad71b34f487c087","coachId":"6a13fcb1410371982246bd1f","level":"info","message":"Training request sent","timestamp":"2026-06-10 10:56:05"}
+{"athleteId":"6a1fede51ad71b34f487c087","coachId":"6a13fcb1410371982246bd1f","level":"info","message":"Training request rejected","requestId":"6a29189511e50d2d55674fa5","timestamp":"2026-06-10 10:56:59"}
+{"athleteId":"6a1fede51ad71b34f487c087","coachId":"6a13fcb1410371982246bd1f","level":"info","message":"Training request sent","timestamp":"2026-06-10 11:03:44"}
+{"athleteId":"6a1fede51ad71b34f487c087","coachId":"6a13fcb1410371982246bd1f","level":"info","message":"Training request rejected","reason":"الجدول مكتمل حالياً، تواصل معي الشهر القادم","requestId":"6a291a608c787fb67549cf97","timestamp":"2026-06-10 11:04:46"}
+{"athleteId":"6a1fede51ad71b34f487c087","coachId":"6a13fcb1410371982246bd1f","level":"info","message":"Training request sent","timestamp":"2026-06-10 11:22:03"}
+{"athleteId":"6a1fede51ad71b34f487c087","coachId":"6a13fcb1410371982246bd1f","level":"info","message":"Training request accepted","requestId":"6a291eabef7778d12ecacd6b","timestamp":"2026-06-10 11:30:08"}
+{"athleteId":"6a1fede51ad71b34f487c087","exercises":3,"level":"info","message":"AI plan created","planId":"6a2930635c431b93e285b2d5","sport":"boxing","timestamp":"2026-06-10 12:37:39"}
+{"error":"Notification validation failed: type: `AI_PLAN_CREATED` is not a valid enum value for path `type`.","level":"error","message":"Failed to create notification","timestamp":"2026-06-10 12:37:39","type":"AI_PLAN_CREATED","userId":"6a13fcb1410371982246bd1f"}
+{"athleteId":"6a1fede51ad71b34f487c087","exercises":3,"level":"info","message":"AI plan created","planId":"6a29325e8a49bf07c69b83f0","sport":"boxing","timestamp":"2026-06-10 12:46:06"}
+{"error":"Notification validation failed: type: `AI_PLAN_CREATED` is not a valid enum value for path `type`.","level":"error","message":"Failed to create notification","timestamp":"2026-06-10 12:46:06","type":"AI_PLAN_CREATED","userId":"6a13fcb1410371982246bd1f"}
+{"coachId":"6a13fcb1410371982246bd1f","level":"info","message":"Progress added","metric":"weight","timestamp":"2026-06-10 13:30:35","traineeId":"6a1fede51ad71b34f487c087","value":72}
+{"athlete":"6a1fede51ad71b34f487c087","coach":"6a13fcb1410371982246bd1f","conversationId":"6a40d61e67a6589b53e249f9","level":"info","message":"Conversation created","timestamp":"2026-06-28 11:06:54"}
+{"error":"Notification validation failed: type: `NEW_MESSAGE` is not a valid enum value for path `type`.","level":"error","message":"Failed to create notification","timestamp":"2026-06-28 11:09:15","type":"NEW_MESSAGE","userId":"6a1fede51ad71b34f487c087"}
+{"error":"Notification validation failed: type: `NEW_MESSAGE` is not a valid enum value for path `type`.","level":"error","message":"Failed to create notification","timestamp":"2026-06-28 11:26:50","type":"NEW_MESSAGE","userId":"6a13fcb1410371982246bd1f"}
+{"error":"Notification validation failed: type: `NEW_MESSAGE` is not a valid enum value for path `type`.","level":"error","message":"Failed to create notification","timestamp":"2026-06-28 11:30:41","type":"NEW_MESSAGE","userId":"6a13fcb1410371982246bd1f"}
+{"error":"Notification validation failed: type: `NEW_MESSAGE` is not a valid enum value for path `type`.","level":"error","message":"Failed to create notification","timestamp":"2026-06-28 11:33:54","type":"NEW_MESSAGE","userId":"6a1fede51ad71b34f487c087"}
+{"level":"info","message":"Avatar uploaded","timestamp":"2026-06-30 11:23:11","url":"https://res.cloudinary.com/dtetfjqgb/image/upload/v1782807787/sportshub/avatars/atl6vrrfsnqhzwn6swe2.jpg","userId":"6a1fede51ad71b34f487c087"}
+{"level":"info","message":"Cover uploaded","timestamp":"2026-06-30 11:38:24","url":"https://res.cloudinary.com/dtetfjqgb/image/upload/v1782808701/sportshub/covers/iviirsraqvivetlu19fc.jpg","userId":"6a1fede51ad71b34f487c087"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-07-02 12:02:49","userId":"6a462935771a2c92f830c9f6"}
+{"level":"info","message":"Email verified","timestamp":"2026-07-02 12:04:49","userId":"6a462935771a2c92f830c9f6"}
+{"level":"info","message":"User registered","role":"coach","timestamp":"2026-07-02 12:23:50","userId":"6a462e1b771a2c92f830c9fa"}
+{"adminId":"6a461fa490ef91a454bafd41","coachId":"6a462e1b771a2c92f830c9fa","level":"info","message":"Coach approved","timestamp":"2026-07-02 12:27:30"}
+{"level":"info","message":"Password reset requested","timestamp":"2026-07-02 12:31:10","userId":"6a462935771a2c92f830c9f6"}
+{"level":"info","message":"Password reset completed","timestamp":"2026-07-02 12:36:02","userId":"6a462935771a2c92f830c9f6"}
+{"adminId":"6a461fa490ef91a454bafd41","level":"info","message":"Sport updated","sportId":"6a46227a8589c8f467c4194d","timestamp":"2026-07-02 12:50:37"}
+{"adminId":"6a461fa490ef91a454bafd41","level":"info","message":"Sport updated","sportId":"6a46227a8589c8f467c4194d","timestamp":"2026-07-02 12:51:26"}
+{"level":"info","message":"Profile updated","timestamp":"2026-07-02 13:16:36","userId":"6a462935771a2c92f830c9f6"}
+{"coachId":"6a462e1b771a2c92f830c9fa","level":"info","message":"Plan created","planId":"6a4a10a4e89039dae9ad8c1b","timestamp":"2026-07-05 11:07:01"}
+{"coachId":"6a462e1b771a2c92f830c9fa","level":"info","message":"Plan created","planId":"6a4a12e31d6561dc1cecc10a","timestamp":"2026-07-05 11:16:35"}
+{"level":"info","message":"Post created","postId":"6a4a142c1d6561dc1cecc10d","timestamp":"2026-07-05 11:22:04","userId":"6a462e1b771a2c92f830c9fa"}
+{"level":"info","message":"Post created","postId":"6a4a14821d6561dc1cecc10f","timestamp":"2026-07-05 11:23:31","userId":"6a462e1b771a2c92f830c9fa"}
+{"athleteId":"6a462935771a2c92f830c9f6","coachId":"6a462e1b771a2c92f830c9fa","level":"info","message":"Training request sent","timestamp":"2026-07-05 11:42:09"}
+{"athleteId":"6a462935771a2c92f830c9f6","coachId":"6a462e1b771a2c92f830c9fa","level":"info","message":"Training request accepted","requestId":"6a4a18e11d6561dc1cecc115","timestamp":"2026-07-05 11:49:09"}
+{"athleteId":"6a462935771a2c92f830c9f6","exercises":3,"level":"info","message":"AI plan created","planId":"6a4a1b4d1d6561dc1cecc11c","sport":"boxing","timestamp":"2026-07-05 11:52:29"}
+{"coachId":"6a462e1b771a2c92f830c9fa","level":"info","message":"Progress added","metric":"weight","timestamp":"2026-07-05 12:05:48","traineeId":"6a462935771a2c92f830c9f6","value":74.5}
+{"coachId":"6a462e1b771a2c92f830c9fa","level":"info","message":"Progress added","metric":"reps","timestamp":"2026-07-05 12:07:21","traineeId":"6a462935771a2c92f830c9f6","value":25}
+{"athlete":"6a462935771a2c92f830c9f6","coach":"6a462e1b771a2c92f830c9fa","conversationId":"6a4a218a1d6561dc1cecc14a","level":"info","message":"Conversation created","timestamp":"2026-07-05 12:19:06"}
+{"level":"info","message":"Avatar uploaded","timestamp":"2026-07-05 12:37:46","url":"https://res.cloudinary.com/dtetfjqgb/image/upload/v1783244266/sportshub/avatars/hdyhdluupgopllafhkl3.jpg","userId":"6a462e1b771a2c92f830c9fa"}
+{"level":"info","message":"Cover uploaded","timestamp":"2026-07-05 12:38:20","url":"https://res.cloudinary.com/dtetfjqgb/image/upload/v1783244300/sportshub/covers/qtdrcns5f5oky2f4kbo3.jpg","userId":"6a462e1b771a2c92f830c9fa"}
+{"level":"info","message":"Profile updated","timestamp":"2026-08-03 18:39:00","userId":"6a461fa490ef91a454bafd41"}
+{"level":"info","message":"Profile updated","timestamp":"2026-08-03 19:24:49","userId":"6a461fa490ef91a454bafd41"}
+{"level":"info","message":"Profile updated","timestamp":"2026-08-03 19:25:13","userId":"6a461fa490ef91a454bafd41"}
+{"level":"info","message":"Profile updated","timestamp":"2026-08-03 19:41:21","userId":"6a461fa490ef91a454bafd41"}
+{"level":"info","message":"Profile updated","timestamp":"2026-08-03 19:41:56","userId":"6a461fa490ef91a454bafd41"}
+{"level":"info","message":"Profile updated","timestamp":"2026-08-03 19:44:30","userId":"6a461fa490ef91a454bafd41"}
+{"level":"info","message":"Profile updated","timestamp":"2026-08-03 19:45:53","userId":"6a461fa490ef91a454bafd41"}
+{"level":"info","message":"Profile updated","timestamp":"2026-08-03 19:47:12","userId":"6a461fa490ef91a454bafd41"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-03 22:23:12","userId":"6a70ea9ede12f409b22466a2"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-03 22:31:21","userId":"6a70ec87de12f409b22466a4"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-03 22:33:36","userId":"6a70ed0ede12f409b22466a8"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-03 22:34:12","userId":"6a70ed32de12f409b22466ab"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-03 23:16:52","userId":"6a70f7329a5a25ae4c835810"}
+{"level":"info","message":"User registered","role":"coach","timestamp":"2026-08-03 23:35:35","userId":"6a70fb959d56ab2a5ad2b2a6"}
+{"adminId":"6a461fa490ef91a454bafd41","coachId":"6a70fb959d56ab2a5ad2b2a6","level":"info","message":"Coach approved","timestamp":"2026-08-04 00:20:31"}
+{"level":"info","message":"Profile updated","timestamp":"2026-08-04 00:24:18","userId":"6a461fa490ef91a454bafd41"}
+{"level":"info","message":"Profile updated","timestamp":"2026-08-04 00:24:36","userId":"6a461fa490ef91a454bafd41"}
+{"level":"info","message":"User registered","role":"coach","timestamp":"2026-08-04 00:41:24","userId":"6a710b010502df078becb117"}
+{"adminId":"6a461fa490ef91a454bafd41","coachId":"6a710b010502df078becb117","level":"info","message":"Coach approved","timestamp":"2026-08-04 00:44:34"}
+{"level":"info","message":"User registered","role":"coach","timestamp":"2026-08-04 00:46:43","userId":"6a710c410502df078becb11c"}
+{"adminId":"6a461fa490ef91a454bafd41","coachId":"6a710c410502df078becb11c","level":"info","message":"Coach rejected","timestamp":"2026-08-04 00:47:02"}
+{"level":"info","message":"User registered","role":"coach","timestamp":"2026-08-04 00:52:41","userId":"6a710da70502df078becb120"}
+{"adminId":"6a461fa490ef91a454bafd41","coachId":"6a710da70502df078becb120","level":"info","message":"Coach approved","timestamp":"2026-08-04 00:52:50"}
+{"level":"info","message":"User registered","role":"coach","timestamp":"2026-08-04 00:54:54","userId":"6a710e2c0502df078becb124"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-04 01:08:29","userId":"6a7111580502df078becb128"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-04 01:25:48","userId":"6a71156a0502df078becb12e"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-04 01:30:42","userId":"6a711691ee75378197039775"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-04 01:36:47","userId":"6a7117fc3948fbc61e9affc1"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-04 12:51:49","userId":"6a71b6347f8c1cba8dd2bb19"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-04 12:56:13","userId":"6a71b73ad13f09d81f8acccf"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-04 13:16:02","userId":"6a71bbe0d7b263af15dae192"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-04 13:22:25","userId":"6a71bd5fd7b263af15dae196"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-04 15:00:33","userId":"6a71d45fb6c4e2d1ba2b3d5b"}
