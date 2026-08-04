@@ -153,4 +153,22 @@ const wrapFields = (fieldsArray) => (req, res, next) => {
   });
 };
 
-module.exports = { upload, wrapFields };
+const wrapSingle = (fieldName) => (req, res, next) => {
+  upload.single(fieldName)(req, res, (err) => {
+    if (err) {
+      console.log('❌ Multer error:', err);
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        err.statusCode = 422;
+        err.message = 'Image size must not exceed 5MB';
+      } else if (err.message?.includes('Only image')) {
+        err.statusCode = 422;
+      } else {
+        err.statusCode = 400;
+      }
+      return next(err);
+    }
+    next();
+  });
+};
+
+module.exports = { upload, wrapSingle, wrapFields }; // ✅ صدّر wrapSingle
