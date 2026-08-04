@@ -128,9 +128,6 @@ class ProfileController {
   updateMyProfile = asyncHandler(async (req, res) => {
     const { name, about, phone, height, weight } = req.body;
 
-    console.log("📁 req.files:", req.files); // شوف الملفات وصلت؟
-    console.log("📝 req.body:", req.body);
-
     const user = await User.findById(req.user.id);
     if (!user) {
       const resp = error('User not found', 404);
@@ -143,28 +140,36 @@ class ProfileController {
     if (height !== undefined) user.height = height;
     if (weight !== undefined) user.weight = weight;
 
-    // معالجة الصور
+    // معالجة الصور من Cloudinary ✅
     if (req.files) {
       if (req.files.avatar && req.files.avatar[0]) {
-        console.log("✅ Avatar file received:", req.files.avatar[0]);
-        user.avatar = req.files.avatar[0].path || req.files.avatar[0].secure_url;
+        // ✅ استخدم secure_url من Cloudinary مباشرة
+        user.avatar = req.files.avatar[0].secure_url;
+        console.log('✅ Avatar uploaded:', user.avatar);
       }
       if (req.files.cover && req.files.cover[0]) {
-        console.log("✅ Cover file received:", req.files.cover[0]);
-        user.cover = req.files.cover[0].path || req.files.cover[0].secure_url;
+        // ✅ استخدم secure_url من Cloudinary مباشرة
+        user.cover = req.files.cover[0].secure_url;
+        console.log('✅ Cover uploaded:', user.cover);
       }
     }
 
     await user.save();
-    console.log("💾 User saved:", user); // تأكد الحفظ
+
+    await createLog({
+      userId: req.user.id,
+      role: req.user.role,
+      action: 'UPDATE_PROFILE',
+      details: 'User updated their profile and/or pictures',
+    });
 
     const resp = success(
       {
         name: user.name,
         about: user.bio,
         phone: user.phone,
-        avatar: user.avatar,  // ✅ تأكد بترجع
-        cover: user.cover,    // ✅ تأكد بترجع
+        avatar: user.avatar,     // ✅ الآن بترجع URL صحيح
+        cover: user.cover,       // ✅ الآن بترجع URL صحيح
         height: user.height,
         weight: user.weight,
       },
