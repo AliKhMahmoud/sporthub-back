@@ -143,12 +143,14 @@ class ProfileController {
     // معالجة الصور المرفوعة عبر Multer بشكل آمن وتجنب تخزين undefined
     if (req.files) {
       if (req.files.avatar && req.files.avatar[0]) {
-        // إذا كنت تستخدم Cloudinary، رابط الصورة يأتي جاهزاً في path أو secure_url
-        user.avatar = req.files.avatar[0].path || req.files.avatar[0].secure_url;
+        user.avatar = req.files.avatar[0].path || req.files.avatar[0].secure_url || req.files.avatar[0].filename;
       }
+      // إذا لم يُرسلavatar جديد، لا نقوم بتعديل user.avatar لتبقى القديمة كما هي
+
       if (req.files.cover && req.files.cover[0]) {
-        user.cover = req.files.cover[0].path || req.files.cover[0].secure_url;
+        user.cover = req.files.cover[0].path || req.files.cover[0].secure_url || req.files.cover[0].filename;
       }
+      // إذا لم يُرسل cover جديد، لا نقوم بتعديل user.cover لتبقى القديمة كما هي
     }
 
     await user.save();
