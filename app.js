@@ -27,6 +27,7 @@ app.use(cookieParser());
    cors({
      origin: [
       process.env.CLIENT_URL,
+      
       "https://sporthub-orcin.vercel.app"
 
     ],

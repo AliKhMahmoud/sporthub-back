@@ -8,7 +8,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS, 
   },
+  family: 4, 
 });
+
 const sendEmail = async (to, subject, text) => {
   try {
     await transporter.sendMail({
@@ -25,6 +27,4 @@ const sendEmail = async (to, subject, text) => {
   }
 };
 
-
 module.exports = sendEmail;
-
