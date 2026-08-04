@@ -9,10 +9,12 @@ const morgan = require("morgan");
 const app = express();
 
 // Middlewares
- const xssSanitize = require("./src/middlewares/xssMiddleware");
- const { apiLimiter } = require("./src/middlewares/limiter");
- const notFound = require("./src/middlewares/notFoundMiddleware");
+const xssSanitize = require("./src/middlewares/xssMiddleware");
+const { apiLimiter } = require("./src/middlewares/limiter");
+const notFound = require("./src/middlewares/notFoundMiddleware");
 
+// Logger (مهم جداً لمراقبة الطلبات في الكونسول)
+app.use(morgan("dev"));
 
 // Body parser
 app.use(express.json());
@@ -20,20 +22,24 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Security
- app.use(helmet());
+app.use(helmet());
 
-// // CORS
- app.use(
-   cors({
-     origin: [
+// XSS Sanitization (هنا كان النقص - لحماية البيانات المدخلة من هجمات XSS)
+app.use(xssSanitize);
+
+// Rate Limiter (هنا كان النقص - لحماية الـ API من الهجمات المتكررة والـ Brute Force)
+app.use("/api/", apiLimiter);
+
+// CORS
+app.use(
+  cors({
+    origin: [
       process.env.CLIENT_URL,
-      
       "https://sporthub-orcin.vercel.app"
-
     ],
-     credentials: true,
-   })
- );
+    credentials: true,
+  })
+);
 
 // ROUTES
 app.use("/api/auth", require("./src/routes/authRoutes"));
@@ -54,13 +60,8 @@ app.use('/api/home', require('./src/routes/homeRoutes'));
 app.use('/api/upload', require('./src/routes/uploadRoutes'));
 app.use('/api/dashboard/coach', require('./src/routes/coachDashboardRoutes'));
 
-// 404 HANDLER (ONLY ONCE)
-app.use((req, res, next) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-  });
-});
+// 404 HANDLER (استخدام الـ notFound middleware المستورد إذا أردت، أو الـ function الحالية)
+app.use(notFound);
 
 // ERROR HANDLER 
 const errorHandler = require("./src/middlewares/errorMiddleware");
