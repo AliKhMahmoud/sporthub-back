@@ -8,8 +8,6 @@ const { createNotification } = require('../utils/notificationService');
 
 class TrainingRequestController {
 
-  // POST /api/training-requests
-  // Athlete — يرسل طلب تدريب لمدرب
   sendRequest = asyncHandler(async (req, res) => {
     const { coachId, message } = req.body;
     const athleteId = req.user.id;
@@ -80,8 +78,6 @@ class TrainingRequestController {
     return res.status(201).json({ ...resp, status: 201 });
   });
 
-  // GET /api/training-requests/my
-  // Athlete — يشوف طلباته
   getMyRequests = asyncHandler(async (req, res) => {
     const requests = await TrainingRequest.find({ athlete: req.user.id })
       .populate('coach', 'name avatar coachSport experienceYears')
@@ -93,8 +89,6 @@ class TrainingRequestController {
     return res.status(resp.status).json(resp);
   });
 
-  // GET /api/training-requests/coach
-  // Coach — يشوف الطلبات الواردة
   getCoachRequests = asyncHandler(async (req, res) => {
     const { status } = req.query;
 
@@ -111,8 +105,6 @@ class TrainingRequestController {
     return res.status(resp.status).json(resp);
   });
 
-  // PUT /api/training-requests/:id/accept
-  // Coach — يقبل طلب
   acceptRequest = asyncHandler(async (req, res) => {
     const request = await TrainingRequest.findOne({
       _id: req.params.id,
@@ -158,8 +150,6 @@ class TrainingRequestController {
     return res.status(resp.status).json(resp);
   });
 
-  // PUT /api/training-requests/:id/reject
-  // Coach — يرفض طلب
   rejectRequest = asyncHandler(async (req, res) => {
     const { reason } = req.body; 
     
