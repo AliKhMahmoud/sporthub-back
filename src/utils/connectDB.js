@@ -7,7 +7,10 @@ const connectDB = async () => {
     throw new Error("MONGO_URL is not defined");
   }
 
-  await mongoose.connect(MONGOURL);
+  const conn = await mongoose.connect(MONGOURL);
+  
+  // اطبع اسم قاعدة البيانات الحالية في التيرمنال
+  console.log(`Connected to Database: ${conn.connection.name}`);
 };
 
 module.exports = connectDB;

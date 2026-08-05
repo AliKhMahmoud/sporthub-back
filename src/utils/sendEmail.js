@@ -1,28 +1,30 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // <--- غيرناها لـ true واستخدمنا منفذ 465 الآمن
+  host: process.env.EMAIL_HOST,        // ✅ من env
+  port: parseInt(process.env.EMAIL_PORT), // ✅ 587 من env
+  secure: false, // ✅ false للـ port 587
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS, 
   },
-  family: 4 // <--- لتجبر السيرفر على استخدام IPv4 وتتجاوز مشكلة Render
+  family: 4
 });
 
 const sendEmail = async (to, subject, text) => {
   try {
+    console.log("📧 Sending email to:", to);
+    
     await transporter.sendMail({
       from: `"SportsHub" <${process.env.EMAIL_USER}>`,
       to,
       subject,
-      text,
+      html: text,
     });
 
-    console.log("📧 Email sent successfully");
+    console.log("✅ Email sent successfully");
   } catch (err) {
-    console.log("❌ Email error:", err.message);
+    console.error("❌ Email error:", err.message);
     return false; 
   }
 };
