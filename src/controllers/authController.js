@@ -138,7 +138,7 @@ class AuthController {
         return res.status(201).json(success(null, message));
   });
 
-  // ─── LOGIN ────────────────────────────────────────────────────────────
+// ─── LOGIN ────────────────────────────────────────────────────────────
   login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     const cacheKey = `login-attempts:${email}`;
@@ -226,8 +226,15 @@ class AuthController {
       details: 'User logged in successfully',
     });
 
+    // ✅ التعديل هنا: إرسال بيانات المستخدم كاملة (مع الـ id والـ email) ضمن الاستجابة ليراها الفرونت
     const resp = success(
-      { role: user.role, name: user.name },
+      { 
+        id: user._id, 
+        name: user.name, 
+        email: user.email, 
+        role: user.role, 
+        avatar: user.avatar 
+      },
       'Login successful'
     );
     return res.status(resp.status).json(resp);
