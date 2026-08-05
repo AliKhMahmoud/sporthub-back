@@ -74,7 +74,7 @@ const MONGO_URL = process.env.MONGO_URL;
 mongoose
   .connect(MONGO_URL)
   .then(() => {
-    console.log("✅ Connected to database");
+    console.log("✅  Connected to database");
     console.log("EMAIL_USER:", process.env.EMAIL_USER);
 
     app.listen(PORT, () => {
