@@ -33,10 +33,11 @@ app.use("/api/", apiLimiter);
 // CORS
 app.use(
   cors({
-    origin: [
-      process.env.CLIENT_URL,
-      "https://sporthub-orcin.vercel.app"
-    ],
+    // origin: [
+    //   process.env.CLIENT_URL,
+    //   "https://sporthub-orcin.vercel.app"
+    // ],
+    origin: "*",
     credentials: true,
   })
 );
