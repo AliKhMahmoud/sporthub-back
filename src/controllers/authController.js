@@ -38,101 +38,104 @@ class AuthController {
 
   // ─── REGISTER ────────────────────────────────────────────────────────
   register = asyncHandler(async (req, res) => {
-      const {
-        name, email, password, phone, role,
-        // حقول المدرب
-        sport, age, experienceYears,
-        workingDays, workingHours, certificates, bio,
-      } = req.body;
+        const {
+          name, email, password, phone, role,
+          // حقول المدرب
+          sport, age, experienceYears,
+          workingDays, workingHours, certificates, bio,
+        } = req.body;
 
-      // تحقق من الإيميل
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        const resp = error('Email already exists', 400);
-        return res.status(resp.status).json(resp);
-      }
-
-      // لو مدرب — تحقق من الرياضة
-      if (role === 'coach') {
-        if (!sport) {
-          const resp = error('Sport is required for coach', 400);
+        // تحقق من الإيميل
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+          const resp = error('Email already exists', 400);
           return res.status(resp.status).json(resp);
         }
-      }
 
-      passwordService.validatePasswordStrength(password);
-      const hashedPassword = await passwordService.hashPassword(password);
-
-      // معالجة وحل الرياضة (تحويل النص إلى ObjectId إذا أرسل المستخدم اسماً مثل "Fitness")
-      let sportId = null;
-      if (role === 'coach' && sport) {
-        if (mongoose.Types.ObjectId.isValid(sport)) {
-          sportId = sport; // إذا كان أصلاً ObjectId جاهز
-        } else {
-          // البحث عن الرياضة في جدول Sport بالاسم أو الـ slug
-          const sportDoc = await Sport.findOne({ 
-            $or: [
-              { name: { $regex: new RegExp(`^${sport}$`, 'i') } }, 
-              { slug: sport.toLowerCase() }
-            ] 
-          });
-          
-          if (sportDoc) {
-            sportId = sportDoc._id;
-          } else {
-            const resp = error('Selected sport does not exist in the database', 400);
+        // لو مدرب — تحقق من الرياضة
+        if (role === 'coach') {
+          if (!sport) {
+            const resp = error('Sport is required for coach', 400);
             return res.status(resp.status).json(resp);
           }
         }
-      }
 
-      // بيانات أساسية للجميع
-      const userData = {
-        name,
-        email,
-        password: hashedPassword,
-        phone: phone || null,
-        role: role || 'athlete',
-        sport: sportId,  // ✅ الـ ObjectId السليم أو null للـ athlete
-      };
+        passwordService.validatePasswordStrength(password);
+        const hashedPassword = await passwordService.hashPassword(password);
 
-      // بيانات إضافية للمدرب
-      if (role === 'coach') {
-        userData.coachStatus  = 'pending'; // ينتظر موافقة Admin
-        userData.age          = age || null;
-        userData.experienceYears = experienceYears || null;
-        userData.workingDays  = workingDays || [];
-        userData.workingHours = workingHours || null;
-        userData.certificates = certificates || [];
-        userData.bio          = bio || null;
-      }
+        // معالجة وحل الرياضة (تحويل النص إلى ObjectId إذا أرسل المستخدم اسماً مثل "Fitness")
+        let sportId = null;
+        if (role === 'coach' && sport) {
+          if (mongoose.Types.ObjectId.isValid(sport)) {
+            sportId = sport; // إذا كان أصلاً ObjectId جاهز
+          } else {
+            // البحث عن الرياضة في جدول Sport بالاسم أو الـ slug
+            const sportDoc = await Sport.findOne({ 
+              $or: [
+                { name: { $regex: new RegExp(`^${sport}$`, 'i') } }, 
+                { slug: sport.toLowerCase() }
+              ] 
+            });
+            
+            if (sportDoc) {
+              sportId = sportDoc._id;
+            } else {
+              const resp = error('Selected sport does not exist in the database', 400);
+              return res.status(resp.status).json(resp);
+            }
+          }
+        }
 
-      const user = await User.create(userData);
+        // بيانات أساسية للجميع
+        const userData = {
+          name,
+          email,
+          password: hashedPassword,
+          phone: phone || null,
+          role: role || 'athlete',
+          sport: sportId,  // ✅ الـ ObjectId السليم أو null للـ athlete
+        };
 
-      // إرسال إيميل التحقق (بدون try-catch صامتة لكي يظهر الخطأ بالكونسول إن وجد)
-      const verifyToken = crypto.randomBytes(32).toString('hex');
-      await Token.create({
-        userId: user._id,
-        token: verifyToken,
-        type: 'emailVerify',
-        expiresAt: Date.now() + 60 * 60 * 1000,
-      });
+        // بيانات إضافية للمدرب
+        if (role === 'coach') {
+          userData.coachStatus  = 'pending'; // ينتظر موافقة Admin
+          userData.age          = age || null;
+          userData.experienceYears = experienceYears || null;
+          userData.workingDays  = workingDays || [];
+          userData.workingHours = workingHours || null;
+          userData.certificates = certificates || [];
+          userData.bio          = bio || null;
+        }
 
-      const verificationUrl = `${process.env.BACKEND_URL || 'http://localhost:8000'}/api/auth/verify-email/${verifyToken}`;
+        const user = await User.create(userData);
 
-      await sendEmail(
-        email,
-        'Verify your email',
-        `Click the link to verify your email: ${verificationUrl}`
-      );
+        // إنشاء توكن التحقق
+        const verifyToken = crypto.randomBytes(32).toString('hex');
+        await Token.create({
+          userId: user._id,
+          token: verifyToken,
+          type: 'emailVerify',
+          expiresAt: Date.now() + 60 * 60 * 1000,
+        });
 
-      logger.info('User registered', { userId: user._id, role: user.role });
+        const verificationUrl = `${process.env.BACKEND_URL || 'http://localhost:8000'}/api/auth/verify-email/${verifyToken}`;
 
-      const message = role === 'coach'
-        ? 'Registered successfully. Your account is pending admin approval.'
-        : 'Registered successfully, verification email sent';
+        // ✅ إرسال إيميل التحقق في الخلفية (بدون await) لكي لا يحدث Timeout
+        sendEmail(
+          email,
+          'Verify your email',
+          `Click the link to verify your email: ${verificationUrl}`
+        ).catch((err) => {
+          console.error("Background email failed:", err.message);
+        });
 
-      return res.status(201).json(success(null, message));
+        logger.info('User registered', { userId: user._id, role: user.role });
+
+        const message = role === 'coach'
+          ? 'Registered successfully. Your account is pending admin approval.'
+          : 'Registered successfully, verification email sent';
+
+        return res.status(201).json(success(null, message));
   });
 
   // ─── LOGIN ────────────────────────────────────────────────────────────
