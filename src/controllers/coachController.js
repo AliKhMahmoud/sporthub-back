@@ -5,48 +5,43 @@ const { success, error } = require('../utils/responseService');
 
 class CoachController {
 
-
   getCoaches = asyncHandler(async (req, res) => {
-    const { sport } = req.query;
+      const { sport } = req.query;
 
-    const filter = {
-      role:        'coach',
-      coachStatus: 'approved',
-      isActive:    true,
-    };
+      const filter = {
+        role:        'coach',
+        coachStatus: 'approved',
+        isActive:    true,
+      };
 
-    if (sport) {
-      const Sport = require('../models/Sport');
-      const mongoose = require('mongoose');
+      if (sport) {
+        const Sport = require('../models/Sport');
+        const mongoose = require('mongoose');
 
-      let sportDoc;
-      // نتحقق إذا كان ما تم إرساله هو ObjectId حقيقي أو slug نصي
-      if (mongoose.Types.ObjectId.isValid(sport)) {
-        sportDoc = await Sport.findOne({ _id: sport, isActive: true }).select('_id');
-      } else {
-        sportDoc = await Sport.findOne({ slug: sport, isActive: true }).select('_id');
+        let sportDoc;
+        // نتحقق إذا كان ما تم إرساله هو ObjectId حقيقي أو slug نصي
+        if (mongoose.Types.ObjectId.isValid(sport)) {
+          sportDoc = await Sport.findOne({ _id: sport, isActive: true }).select('_id');
+        } else {
+          sportDoc = await Sport.findOne({ slug: sport, isActive: true }).select('_id');
+        }
+
+        if (!sportDoc) {
+          const resp = success([], 'No coaches found for this sport');
+          return res.status(resp.status).json(resp);
+        }
+        
+        // الاعتماد حصراً على حقل sport
+        filter.sport = sportDoc._id;
       }
 
-      if (!sportDoc) {
-        const resp = success([], 'No coaches found for this sport');
-        return res.status(resp.status).json(resp);
-      }
-      
-      // ✅ البحث في كلا الحقلين (sport و coachSport) لضمان جلب جميع المدربين بغض النظر عن اختلاف تسمية الحقل في الداتا بيز
-      filter.$or = [
-        { sport: sportDoc._id },
-        { coachSport: sportDoc._id }
-      ];
-    }
+      const coaches = await User.find(filter)
+        .select('name avatar bio cover sport age experienceYears workingDays workingHours certificates isOnline lastSeen createdAt')
+        .populate('sport', 'name slug colorTheme')
+        .sort({ experienceYears: -1 });
 
-    const coaches = await User.find(filter)
-      .select('name avatar bio cover sport coachSport age experienceYears workingDays workingHours certificates isOnline lastSeen createdAt')
-      .populate('sport', 'name slug colorTheme')
-      .populate('coachSport', 'name slug colorTheme')
-      .sort({ experienceYears: -1 });
-
-    const resp = success(coaches, 'Coaches fetched successfully');
-    return res.status(resp.status).json(resp);
+      const resp = success(coaches, 'Coaches fetched successfully');
+      return res.status(resp.status).json(resp);
   });
 
   // GET /api/coaches/:id
