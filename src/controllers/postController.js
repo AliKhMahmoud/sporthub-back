@@ -70,6 +70,44 @@ class PostController {
     return res.status(resp.status).json(resp);
   });
 
+  // GET /api/posts/sport/:sportId
+  // Public — جلب المنشورات التابعة لرياضة محددة
+  getPostsBySport = asyncHandler(async (req, res) => {
+    const { sportId } = req.params;
+    const { page = 1, limit = 10, sort = 'latest' } = req.query;
+
+    const sport = await Sport.findOne({ _id: sportId, isActive: true });
+    if (!sport) {
+      const resp = error('Sport not found', 404);
+      return res.status(resp.status).json(resp);
+    }
+
+    const filter = { sport: sport._id, isActive: true };
+    const sortOption = sort === 'popular' ? { views: -1 } : { createdAt: -1 };
+
+    const total = await Post.countDocuments(filter);
+    const posts = await Post.find(filter)
+      .populate('author', 'name avatar')
+      .populate('sport', 'name slug colorTheme')
+      .select('-__v')
+      .sort(sortOption)
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    const resp = success(
+      {
+        posts,
+        pagination: {
+          total,
+          page: Number(page),
+          pages: Math.ceil(total / limit),
+        },
+      },
+      'Posts by sport fetched successfully'
+    );
+    return res.status(resp.status).json(resp);
+  });
+
   // POST /api/posts
   // User + Publisher — إنشاء منشور
   createPost = asyncHandler(async (req, res) => {
@@ -142,7 +180,7 @@ class PostController {
   });
 
   // DELETE /api/posts/:id
-  // صاحبه أو Admin — Soft delete
+  // صاحبه أو Admin — Hard delete
   deletePost = asyncHandler(async (req, res) => {
     const post = await Post.findById(req.params.id);
 
@@ -200,7 +238,6 @@ class PostController {
         link: `/forum/posts/${post._id}`,
       });
     }
-    
 
     const resp = success({ likesCount: post.likes.length }, 'Post liked');
     return res.status(resp.status).json(resp);
@@ -332,43 +369,5 @@ class PostController {
     return res.status(resp.status).json(resp);
   });
 }
-
-  // GET /api/posts/sport/:sportId
-  // Public — جلب المنشورات التابعة لرياضة محددة
-  getPostsBySport = asyncHandler(async (req, res) => {
-    const { sportId } = req.params;
-    const { page = 1, limit = 10, sort = 'latest' } = req.query;
-
-    const sport = await Sport.findOne({ _id: sportId, isActive: true });
-    if (!sport) {
-      const resp = error('Sport not found', 404);
-      return res.status(resp.status).json(resp);
-    }
-
-    const filter = { sport: sport._id, isActive: true };
-    const sortOption = sort === 'popular' ? { views: -1 } : { createdAt: -1 };
-
-    const total = await Post.countDocuments(filter);
-    const posts = await Post.find(filter)
-      .populate('author', 'name avatar')
-      .populate('sport', 'name slug colorTheme')
-      .select('-__v')
-      .sort(sortOption)
-      .skip((page - 1) * limit)
-      .limit(Number(limit));
-
-    const resp = success(
-      {
-        posts,
-        pagination: {
-          total,
-          page: Number(page),
-          pages: Math.ceil(total / limit),
-        },
-      },
-      'Posts by sport fetched successfully'
-    );
-    return res.status(resp.status).json(resp);
-  });
 
 module.exports = new PostController();
