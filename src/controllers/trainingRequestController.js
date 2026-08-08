@@ -193,7 +193,7 @@ class TrainingRequestController {
 
     const resp = success(request, 'Training request rejected');
     return res.status(resp.status).json(resp);
-    });
+  });
 }
 
 module.exports = new TrainingRequestController();

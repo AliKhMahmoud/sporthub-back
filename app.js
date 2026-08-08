@@ -59,6 +59,7 @@ app.use('/api/chat', require('./src/routes/chatRoutes'));
 app.use('/api/home', require('./src/routes/homeRoutes'));
 app.use('/api/upload', require('./src/routes/uploadRoutes'));
 app.use('/api/dashboard/coach', require('./src/routes/coachDashboardRoutes'));
+app.use('/api/workout-progress', require('./src/routes/workoutProgressRoutes'));
 
 // 404 HANDLER (استخدام الـ notFound middleware المستورد إذا أردت، أو الـ function الحالية)
 app.use(notFound);
