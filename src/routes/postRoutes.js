@@ -10,6 +10,7 @@ const { createPostSchema, updatePostSchema, commentSchema } = require('../valida
 
 // Public
 router.get('/', postController.getPosts);
+router.get('/sport/:sportId', postController.getPostsBySport);
 router.get('/:id', postController.getPostById);
 
 // User + Publisher
