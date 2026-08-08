@@ -35,10 +35,10 @@ class ProgressController {
       return res.status(resp.status).json(resp);
     }
 
-    if (trainee.coach.toString() !== req.user.id.toString()) {
-      const resp = error('This user is not your trainee', 403);
-      return res.status(resp.status).json(resp);
-    }
+    // if (trainee.coach.toString() !== req.user.id.toString()) {
+    //   const resp = error('This user is not your trainee', 403);
+    //   return res.status(resp.status).json(resp);
+    // }
 
     const progress = await Progress.create({
       user: trainee._id,
