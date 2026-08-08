@@ -11,5 +11,4 @@ router.post('/', requireAuth, authorize('coach'), validate(addProgressSchema), p
 router.get('/me', requireAuth, progressController.getMyProgress);
 router.get('/me/stats', requireAuth, progressController.getMyStats);
 router.delete('/:id', requireAuth, progressController.deleteProgress);
-router.get('/sport/:sportSlug', requireAuth, progressController.getProgressBySport);
 module.exports = router;
