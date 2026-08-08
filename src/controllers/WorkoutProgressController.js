@@ -66,8 +66,8 @@ class WorkoutProgressController {
     const progress = await WorkoutProgress.findOne({
       athlete: req.user.id,
       plan: planId,
-      status: 'in-progress',
-    }).populate('plan', 'title description exercises');
+      status: { $in: ['in-progress', 'completed'] }, // ✅ يبحث عن الحالتين معاً
+    }).sort({ createdAt: -1 }).populate('plan', 'title description exercises'); // يجلب الأحدث
 
     if (!progress) {
       const resp = error('No active progress found for this plan', 404);
