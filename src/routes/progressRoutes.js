@@ -12,7 +12,7 @@ router.get('/me/stats', requireAuth, authorize('athlete'), progressController.ge
 
 // للكوتش
 router.post('/', requireAuth, authorize('coach'), validate(addProgressSchema), progressController.addProgress);
-router.get('/coach/all', requireAuth, authorize('coach'), progressController.getAllTraineesProgress);
+router.get('/', requireAuth, authorize('coach'), progressController.getAllTraineesProgress);
 router.get('/trainee/:traineeId', requireAuth, authorize('coach'), progressController.getProgressByTrainee);
 
 router.delete('/:id', requireAuth, progressController.deleteProgress);
