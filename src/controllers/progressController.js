@@ -167,7 +167,11 @@ class ProgressController {
       return res.status(resp.status).json(resp);
     }
 
-    if (progress.user.toString() !== req.user.id.toString()) {
+    // السماح بالحذف إذا كان المستخدم هو نفس المتدرب، أو إذا كان هو الكوتش الذي قام بتسجيله
+    const isOwner = progress.user.toString() === req.user.id.toString();
+    const isTrackerCoach = progress.trackedBy && progress.trackedBy.toString() === req.user.id.toString();
+
+    if (!isOwner && !isTrackerCoach) {
       const resp = error('You are not authorized to delete this record', 403);
       return res.status(resp.status).json(resp);
     }
