@@ -13,7 +13,6 @@ const updateProfileSchema = Joi.object({
       'string.pattern.base': 'Name can only contain letters and spaces',
     }),
 
-  // تم تعديل bio إلى about ليطابق الفرت إند
   about: Joi.string()
     .trim()
     .max(300)
@@ -36,12 +35,6 @@ const updateProfileSchema = Joi.object({
     .messages({
       'string.pattern.base': 'Phone number is not valid',
     }),
-
-  // السماح بأن يكون الـ avatar نصاً (في حال أرسل رابطاً قديماً) أو أي قيمة أخرى لكونه ملف مرفوع
-  avatar: Joi.any().optional(),
-  
-  // إضافة cover أيضاً ليتسنى لنا استقباله ومعالجته في الـ Controller
-  cover: Joi.any().optional(),
 
   height: Joi.number()
     .min(50)

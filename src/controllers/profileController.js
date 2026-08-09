@@ -37,7 +37,6 @@ class ProfileController {
       return res.status(resp.status).json(resp);
     }
 
-    // 🔥 grouping (DTO)
     const formattedProfile = {
       _id: user._id,
       name: user.name,
@@ -124,7 +123,7 @@ class ProfileController {
   });
 
   // PUT /api/profile/me
-  // المستخدم يعدل بياناته الشخصية والصور
+  // المستخدم يعدل بياناته الشخصية فقط
   updateMyProfile = asyncHandler(async (req, res) => {
     const { name, about, phone, height, weight } = req.body;
 
@@ -140,27 +139,13 @@ class ProfileController {
     if (height !== undefined) user.height = height;
     if (weight !== undefined) user.weight = weight;
 
-    // معالجة الصور من Cloudinary ✅
-    if (req.files) {
-      if (req.files.avatar && req.files.avatar[0]) {
-        // ✅ استخدم secure_url من Cloudinary مباشرة
-        user.avatar = req.files.avatar[0].secure_url;
-        console.log('✅ Avatar uploaded:', user.avatar);
-      }
-      if (req.files.cover && req.files.cover[0]) {
-        // ✅ استخدم secure_url من Cloudinary مباشرة
-        user.cover = req.files.cover[0].secure_url;
-        console.log('✅ Cover uploaded:', user.cover);
-      }
-    }
-
     await user.save();
 
     await createLog({
       userId: req.user.id,
       role: req.user.role,
       action: 'UPDATE_PROFILE',
-      details: 'User updated their profile and/or pictures',
+      details: 'User updated their profile information',
     });
 
     const resp = success(
@@ -168,8 +153,8 @@ class ProfileController {
         name: user.name,
         about: user.bio,
         phone: user.phone,
-        avatar: user.avatar,     // ✅ الآن بترجع URL صحيح
-        cover: user.cover,       // ✅ الآن بترجع URL صحيح
+        avatar: user.avatar,
+        cover: user.cover,
         height: user.height,
         weight: user.weight,
       },
@@ -179,7 +164,6 @@ class ProfileController {
   });
 
   // GET /api/profile/me/activity
-  // المستخدم يشوف نشاطه — منشوراته + عدد تعليقاته
   getMyActivity = asyncHandler(async (req, res) => {
     const userId = req.user.id;
 
@@ -188,12 +172,10 @@ class ProfileController {
       .select('title likes views createdAt')
       .sort({ createdAt: -1 });
 
-    // إحصائيات سريعة
     const totalPosts = posts.length;
     const totalLikes = posts.reduce((sum, p) => sum + p.likes.length, 0);
     const totalViews = posts.reduce((sum, p) => sum + p.views, 0);
 
-    // لو coach — جلب خططه
     let plans = [];
     if (req.user.role === 'coach') {
       plans = await Plan.find({ createdBy: userId, isActive: true })
@@ -214,7 +196,6 @@ class ProfileController {
   });
 
   // PUT /api/profile/assign-coach
-  // المتدرب يختار مدربه
   assigncoach = asyncHandler(async (req, res) => {
     const { coachId } = req.body;
 

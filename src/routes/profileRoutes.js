@@ -5,7 +5,6 @@ const profileController = require('../controllers/profileController');
 const { requireAuth } = require('../middlewares/authMiddleware');
 const validate = require('../middlewares/validate');
 const { updateProfileSchema } = require('../validations/profileValidation');
-const { wrapFields } = require('../middlewares/uploadMiddleware'); // استدعاء المغلف الجديد
 
 // Protected — المستخدم نفسه
 router.get('/me', requireAuth, profileController.getMyProfile);
@@ -13,11 +12,6 @@ router.get('/me', requireAuth, profileController.getMyProfile);
 router.put(
   '/me',
   requireAuth,
-  // استقبال avatar و cover معا (بحد أقصى ملف واحد لكل منهما)
-  wrapFields([
-    { name: 'avatar', maxCount: 1 },
-    { name: 'cover', maxCount: 1 }
-  ]),
   validate(updateProfileSchema), 
   profileController.updateMyProfile
 );
