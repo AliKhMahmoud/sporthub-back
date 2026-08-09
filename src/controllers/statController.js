@@ -3,6 +3,7 @@ const AIPlan   = require('../models/AIPlan');
 const Progress = require('../models/Progress');
 const Post     = require('../models/Post');
 const User     = require('../models/User');
+const ActivityLog = require('../models/ActivityLog');
 const asyncHandler = require('../utils/asyncHandler');
 const { success, error } = require('../utils/responseService');
 const {
@@ -11,7 +12,21 @@ const {
   getLevelTitle,
   getXPForNextLevel,
   getEarnedBadges,
+  LEVEL_THRESHOLDS,
 } = require('../utils/badgeService');
+
+// ─── Helper: حساب XP Progress نسبة للـ level ──────────────────────────────
+const calculateXPProgress = (xp, level) => {
+  const currentThreshold = LEVEL_THRESHOLDS[level - 1] || 0;
+  const nextThreshold = LEVEL_THRESHOLDS[level] || currentThreshold + 1000;
+
+  if (nextThreshold === currentThreshold) {
+    // Max level
+    return 100;
+  }
+
+  return Math.round(((xp - currentThreshold) / (nextThreshold - currentThreshold)) * 100);
+};
 
 class StatController {
 
@@ -76,10 +91,7 @@ class StatController {
     const level      = getLevelFromXP(xp);
     const levelTitle = getLevelTitle(level);
     const xpForNext  = getXPForNextLevel(level);
-    const xpProgress = xpForNext
-      ? Math.round(((xp - (require('../utils/badgeService').LEVEL_THRESHOLDS[level - 1] || 0)) /
-          (xpForNext - (require('../utils/badgeService').LEVEL_THRESHOLDS[level - 1] || 0))) * 100)
-      : 100;
+    const xpProgress = calculateXPProgress(xp, level);
 
     // ─── 5. الشارات ──────────────────────────────────────────────────────
     const badges = getEarnedBadges({
@@ -91,15 +103,18 @@ class StatController {
       hasMaxRating,
     });
 
-    // ─── 6. آخر النشاطات (من ActivityLog) ───────────────────────────────
-    const ActivityLog = require('../models/ActivityLog');
+    // ─── 6. آخر النشاطات ────────────────────────────────────────────────
     const recentActivity = await ActivityLog.find({ userId })
       .sort({ createdAt: -1 })
       .limit(10)
       .select('action details createdAt');
 
     // ─── 7. تحديث XP و Level على الـ User (للقراءة السريعة) ─────────────
-    await User.findByIdAndUpdate(userId, { xp, level, badges: badges.map(b => b.id) });
+    await User.findByIdAndUpdate(userId, { 
+      xp, 
+      level, 
+      badges: badges.map(b => b.id) 
+    });
 
     // ─── Response ─────────────────────────────────────────────────────────
     const resp = success({
@@ -160,14 +175,20 @@ class StatController {
     const userPosts = await Post.find({ author: userId, isActive: true }).select('likes');
     const receivedLikes = userPosts.reduce((sum, p) => sum + (p.likes?.length || 0), 0);
 
-    const { LEVEL_THRESHOLDS } = require('../utils/badgeService');
+    // حساب xpProgress
+    const userLevel = user.level || 1;
+    const userXP = user.xp || 0;
+    const xpForNext = getXPForNextLevel(userLevel);
+    const xpProgress = calculateXPProgress(userXP, userLevel);
 
     const resp = success({
       user:          { id: user._id, name: user.name, avatar: user.avatar, role: user.role },
-      xp:            user.xp    || 0,
-      level:         user.level || 1,
-      levelTitle:    getLevelTitle(user.level || 1),
+      xp:            userXP,
+      level:         userLevel,
+      levelTitle:    getLevelTitle(userLevel),
       badges:        user.badges || [],
+      xpForNextLevel: xpForNext,
+      xpProgress,              // نسبة التقدم نحو المستوى الجاي (0-100)
       totalPlans,
       completedPlans,
       averageProgress,

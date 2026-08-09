@@ -55,7 +55,9 @@ app.use('/api/progress', require('./src/routes/progressRoutes'));
 app.use('/api/ai-plans', require('./src/routes/aiPlanRoutes'));
 app.use('/api/stats', require('./src/routes/statRoutes'));
 app.use('/api/coaches', require('./src/routes/coachRoutes'));
+
 app.use('/api/chat', require('./src/routes/chatRoutes'));
+
 app.use('/api/home', require('./src/routes/homeRoutes'));
 app.use('/api/upload', require('./src/routes/uploadRoutes'));
 app.use('/api/dashboard/coach', require('./src/routes/coachDashboardRoutes'));
