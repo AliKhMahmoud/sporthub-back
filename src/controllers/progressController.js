@@ -96,34 +96,25 @@ class ProgressController {
     return res.status(resp.status).json(resp);
   });
 
-  // GET /api/progress/sport/:sportSlug
-  // جلب تقدم المستخدم أو الرياضة حسب الـ slug
-  getProgressBySport = asyncHandler(async (req, res) => {
-    try {
-      console.log("Fetching progress for sport slug:", req.params.sportSlug);
-      const { sportSlug } = req.params;
+  // الكوتش يجلب تقدم أحد متدربيه
+  getProgressByTrainee = asyncHandler(async (req, res) => {
+    const { traineeId } = req.params;
 
-      const sport = await Sport.findOne({ slug: sportSlug, isActive: true });
-      if (!sport) {
-        console.log("Sport not found for slug:", sportSlug);
-        const resp = error('Sport not found', 404);
-        return res.status(resp.status).json(resp);
-      }
-
-      const records = await Progress.find({
-        user: req.user.id,
-        sport: sport._id,
-      })
-        .populate('sport', 'name slug colorTheme')
-        .select('-__v')
-        .sort({ recordedAt: 1 });
-
-      const resp = success(records, 'Sport progress fetched successfully');
+    // التأكد أن المتدرب تابع لهذا الكوتش
+    const trainee = await User.findOne({ _id: traineeId, coach: req.user.id });
+    if (!trainee) {
+      const resp = error('Trainee not found or not assigned to you', 404);
       return res.status(resp.status).json(resp);
-    } catch (err) {
-      console.error("ERROR in getProgressBySport:", err);
-      throw err;
     }
+
+    const records = await Progress.find({ user: traineeId })
+      .populate('sport', 'name slug colorTheme')
+      .populate('trackedBy', 'name role')
+      .select('-__v')
+      .sort({ recordedAt: 1 });
+
+    const resp = success(records, 'Trainee progress fetched successfully');
+    return res.status(resp.status).json(resp);
   });
 
   // GET /api/progress/me/stats?sport=slug
