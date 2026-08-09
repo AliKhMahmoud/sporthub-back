@@ -11,7 +11,7 @@ router.get('/me', requireAuth, authorize('athlete'), progressController.getMyPro
 router.get('/me/stats', requireAuth, authorize('athlete'), progressController.getMyStats);
 
 // للكوتش
-router.post('/', requireAuth, authorize('coach'), validate(addProgressSchema), progressController.addProgress);
+router.post('/', requireAuth, validate(addProgressSchema), progressController.addProgress);
 router.get('/', requireAuth, authorize('coach'), progressController.getAllTraineesProgress);
 router.get('/trainee/:traineeId', requireAuth, authorize('coach'), progressController.getProgressByTrainee);
 
