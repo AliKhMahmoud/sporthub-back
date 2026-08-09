@@ -67,6 +67,23 @@ class ProgressController {
     const resp = success(progress, 'Progress recorded successfully');
     return res.status(201).json({ ...resp, status: 201 });
   });
+  
+  getAllTraineesProgress = asyncHandler(async (req, res) => {
+    // 1. جلب كل المستخدمين (المتدربين) التابعين لهذا الكوتش
+    const trainees = await User.find({ coach: req.user.id }).select('_id');
+    const traineeIds = trainees.map(t => t._id);
+
+    // 2. جلب كل سجلات التقدم الخاصة بهؤلاء المتدربين
+    const records = await Progress.find({ user: { $in: traineeIds } })
+      .populate('user', 'name email avatar') // جلب معلومات المتدرب
+      .populate('sport', 'name slug colorTheme')
+      .populate('trackedBy', 'name role')
+      .select('-__v')
+      .sort({ recordedAt: -1 }); // الأحدث أولاً
+
+    const resp = success(records, 'All trainees progress fetched successfully');
+    return res.status(resp.status).json(resp);
+  });
 
 
   // GET /api/progress/me?sport=slug&metric=weight
