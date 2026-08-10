@@ -21,6 +21,7 @@ router.delete('/:id',
 );
 
 router.put('/:id/exercise/:exerciseId/toggle',
+  
   requireAuth,
   authorize('athlete'),
   aiPlanController.toggleExercise
