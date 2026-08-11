@@ -1,16 +1,20 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // يجب أن تكون false مع المنفذ 587
-  family: 4,     // 🔑 هذا هو الحل: الإجبار على استخدام IPv4 فقط وتجاهل IPv6
+  host: process.env.EMAIL_HOST || "smtp.gmail.com",
+  port: Number(process.env.EMAIL_PORT) || 587,
+  secure: false,
+  family: 4,
+  // 🔑 مهلات الاتصال لتفادي الـ Connection Timeout على سيرفرات Render المجانية
+  connectionTimeout: 20000, // 20 ثانية
+  greetingTimeout: 20000,
+  socketTimeout: 20000,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false, // يمنع مشاكل الشهادات مع Render
+    rejectUnauthorized: false,
   },
 });
 
