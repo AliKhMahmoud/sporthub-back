@@ -109,7 +109,7 @@ class AuthController {
     });
 
     // إرسال رابط يتجه للفرونت إند للتوثيق
-    const verificationUrl = `${process.env.BACKEND_URL || 'http://localhost:5173'}/verify-email/${verifyToken}`;
+    const verificationUrl = `${process.env.BACKEND_URL}/api/auth/verify-email/${verifyToken}`;
 
     // 🔴 التعديل هنا: تمرير Object بدلاً من القيم المتتالية مع قالب HTML
     sendEmail({
@@ -294,6 +294,7 @@ class AuthController {
   // ─── VERIFY EMAIL ─────────────────────────────────────────────────────
   verifyEmail = asyncHandler(async (req, res) => {
     const tokenString = req.params.token;
+    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
 
     const token = await Token.findOne({
       token: tokenString,
@@ -302,24 +303,28 @@ class AuthController {
     });
 
     if (!token) {
-      const resp = error('Invalid or expired token', 400);
-      return res.status(resp.status).json(resp);
+      // إذا كان التوكن خطأ أو منتهي الصلاحية، توجيهه لصفحة اللوجن مع رسالة خطأ
+      return res.redirect(`${clientUrl}/login?error=invalid-or-expired-token`);
     }
 
-    await User.findByIdAndUpdate(token.userId, { isVerified: true });
+    const user = await User.findById(token.userId);
+    if (user) {
+      user.isVerified = true;
+      await user.save();
+
+      await createLog({
+        userId: user._id,
+        role: user.role, // استخدام دور المستخدم الحقيقي
+        action: 'EMAIL_VERIFIED',
+        details: 'Email verified successfully',
+      });
+    }
+
     await token.deleteOne();
-
-    await createLog({
-      userId: token.userId,
-      role: 'athlete',
-      action: 'EMAIL_VERIFIED',
-      details: 'Email verified successfully',
-    });
-
     logger.info('Email verified', { userId: token.userId });
 
-    const resp = success(null, 'Email verified successfully');
-    return res.status(resp.status).json(resp);
+    // 🚀 تحويل تلقائي وناجح للفرونت إند
+    return res.redirect(`${clientUrl}/login?verified=true`);
   });
 
   // ─── FORGOT PASSWORD ──────────────────────────────────────────────────

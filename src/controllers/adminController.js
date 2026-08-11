@@ -1,6 +1,6 @@
 const User = require('../models/User');
-const Post   = require('../models/Post');
-const Plan   = require('../models/Plan');
+const Post = require('../models/Post');
+const Plan = require('../models/Plan');
 const AIPlan = require('../models/AIPlan');
 const asyncHandler = require('../utils/asyncHandler');
 const logger = require('../utils/logger');
@@ -11,7 +11,6 @@ const { createNotification } = require('../utils/notificationService');
 class AdminController {
 
   // GET /api/admin/coach-requests
-  // Admin — جلب كل طلبات المدربين
   getCoachRequests = asyncHandler(async (req, res) => {
     const { status = 'pending' } = req.query;
 
@@ -19,7 +18,8 @@ class AdminController {
       role: 'coach',
       coachStatus: status,
     })
-      .select('name email coachSport age experienceYears workingDays workingHours certificates bio avatar createdAt coachStatus')
+      .populate('sport', 'name slug colorTheme') // 👈 تعديل اسم الحقل وجلب بيانات الرياضة
+      .select('name email sport age experienceYears workingDays workingHours certificates bio avatar createdAt coachStatus')
       .sort({ createdAt: -1 });
 
     const resp = success(coaches, 'Coach requests fetched successfully');
@@ -27,7 +27,6 @@ class AdminController {
   });
 
   // PUT /api/admin/coach-requests/:id/approve
-  // Admin — يوافق على مدرب
   approveCoach = asyncHandler(async (req, res) => {
     const coach = await User.findOne({ _id: req.params.id, role: 'coach' });
 
@@ -69,8 +68,8 @@ class AdminController {
   });
 
   // PUT /api/admin/coach-requests/:id/reject
-  // Admin — يرفض مدرب
   rejectCoach = asyncHandler(async (req, res) => {
+    const { reason } = req.body; // 👈 إضافة إمكانية استقبال سبب الرفض
     const coach = await User.findOne({ _id: req.params.id, role: 'coach' });
 
     if (!coach) {
@@ -90,7 +89,7 @@ class AdminController {
       userId: coach._id,
       type: 'COACH_REJECTED',
       title: 'Account Rejected',
-      message: 'Your coach account request has been rejected.',
+      message: reason ? `Your request was rejected. Reason: ${reason}` : 'Your coach account request has been rejected.',
       link: null,
     });
 
@@ -111,7 +110,6 @@ class AdminController {
   });
 
   // GET /api/admin/users
-  // Admin — جلب كل المستخدمين
   getAllUsers = asyncHandler(async (req, res) => {
     const { role, page = 1, limit = 20 } = req.query;
 
@@ -120,6 +118,7 @@ class AdminController {
 
     const total = await User.countDocuments(filter);
     const users = await User.find(filter)
+      .populate('sport', 'name slug')
       .select('-password -__v')
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
@@ -140,7 +139,6 @@ class AdminController {
   });
 
   // DELETE /api/admin/users/:id
-  // Admin — تعطيل مستخدم (Soft delete)
   deactivateUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
 
@@ -149,8 +147,9 @@ class AdminController {
       return res.status(resp.status).json(resp);
     }
 
-    if (user.role === 'admin') {
-      const resp = error('Cannot deactivate admin', 403);
+    // 👈 حماية: منع تعطيل الأدمن أو السوبر آدمن أو تعطيل الشخص لحسابه بنفسه
+    if (user.role === 'admin' || user.email === process.env.SUPERADMIN_EMAIL) {
+      const resp = error('Cannot deactivate admin or superadmin accounts', 403);
       return res.status(resp.status).json(resp);
     }
 
@@ -169,9 +168,8 @@ class AdminController {
   });
 
   // GET /api/admin/stats
-  // Admin — إحصائيات لوحة التحكم
   getDashboardStats = asyncHandler(async (req, res) => {
-    const [athletes, coaches, pendingCoaches, totalUsers , totalPosts, totalPlans, totalAIPlans] = await Promise.all([
+    const [athletes, coaches, pendingCoaches, totalUsers, totalPosts, totalPlans, totalAIPlans] = await Promise.all([
       User.countDocuments({ role: 'athlete', isActive: true }),
       User.countDocuments({ role: 'coach', coachStatus: 'approved', isActive: true }),
       User.countDocuments({ role: 'coach', coachStatus: 'pending' }),
@@ -182,8 +180,14 @@ class AdminController {
     ]);
 
     const resp = success(
-      { totalUsers, athletes, coaches, pendingCoaches,totalPosts,                                     // ✅ جديد
-      totalPlans: totalPlans + totalAIPlans },
+      { 
+        totalUsers, 
+        athletes, 
+        coaches, 
+        pendingCoaches, 
+        totalPosts,                         
+        totalPlans: totalPlans + totalAIPlans 
+      },
       'Stats fetched successfully'
     );
     return res.status(resp.status).json(resp);

@@ -17,6 +17,13 @@ const transporter = nodemailer.createTransport({
     rejectUnauthorized: false,
   },
 });
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("❌ Nodemailer verification failed:", error.message);
+  } else {
+    console.log("✅ Nodemailer is ready to send emails!");
+  }
+});
 
 const sendEmail = async ({ to, subject, html, text }) => {
   try {
