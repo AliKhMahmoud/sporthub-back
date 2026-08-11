@@ -10,7 +10,8 @@ class TokenService {
             },
             process.env.SECRET_ACCESS_TOKEN_KEY,
             {
-                expiresIn: "15m",
+                // expiresIn: "15m",
+                expiresIn: "200m",
             }
         );
     }

@@ -16,134 +16,133 @@ const { createLog } = require('../utils/ActivityLog');
 
 const crypto = require('crypto');
 
+// ─── Helper Functions ──────────────────────────────────────────────────
+const handleFailedLogin = async (user) => {
+  user.failedLoginAttempts += 1;
+  if (user.failedLoginAttempts >= 5) {
+    user.isLocked = true;
+    user.lockedUntil = new Date(Date.now() + 30 * 60 * 1000);
+    logger.warn(`User locked: ${user.email}`);
+  }
+  await user.save();
+};
+
+const resetFailedLoginAttempts = async (user) => {
+  user.failedLoginAttempts = 0;
+  user.isLocked = false;
+  user.lockedUntil = null;
+  await user.save();
+};
+
 class AuthController {
-
-  // ─── Handle failed login attempts ────────────────────────────────────
-  handledFailedLogin = asyncHandler(async (user) => {
-    user.failedLoginAttempts += 1;
-    if (user.failedLoginAttempts >= 5) {
-      user.isLocked = true;
-      user.lockedUntil = new Date(Date.now() + 30 * 60 * 1000);
-      logger.warn(`User locked: ${user.email}`);
-    }
-    await user.save();
-  });
-
-  resetFailedLoginAttemtps = asyncHandler(async (user) => {
-    user.failedLoginAttempts = 0;
-    user.isLocked = false;
-    user.lockedUntil = null;
-    await user.save();
-  });
 
   // ─── REGISTER ────────────────────────────────────────────────────────
   register = asyncHandler(async (req, res) => {
-      const {
-        name, email, password, phone, role,
-        // حقول المدرب
-        sport, age, experienceYears,
-        workingDays, workingHours, certificates, bio,
-      } = req.body;
+    const {
+      name, email, password, phone, role,
+      sport, age, experienceYears,
+      workingDays, workingHours, certificates, bio,
+    } = req.body;
 
-      // تحقق من الإيميل
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        const resp = error('Email already exists', 400);
-        return res.status(resp.status).json(resp);
-      }
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      const resp = error('Email already exists', 400);
+      return res.status(resp.status).json(resp);
+    }
 
-      // لو مدرب — تحقق من الرياضة
-      if (role === 'coach') {
-        if (!sport) {
-          const resp = error('Sport is required for coach', 400);
+    if (role === 'coach' && !sport) {
+      const resp = error('Sport is required for coach', 400);
+      return res.status(resp.status).json(resp);
+    }
+
+    passwordService.validatePasswordStrength(password);
+    const hashedPassword = await passwordService.hashPassword(password);
+
+    let sportId = null;
+    if (role === 'coach' && sport) {
+      if (mongoose.Types.ObjectId.isValid(sport)) {
+        sportId = sport;
+      } else {
+        const sportDoc = await Sport.findOne({ 
+          $or: [
+            { name: { $regex: new RegExp(`^${sport}$`, 'i') } }, 
+            { slug: sport.toLowerCase() }
+          ] 
+        });
+        
+        if (sportDoc) {
+          sportId = sportDoc._id;
+        } else {
+          const resp = error('Selected sport does not exist in the database', 400);
           return res.status(resp.status).json(resp);
         }
       }
+    }
 
-      passwordService.validatePasswordStrength(password);
-      const hashedPassword = await passwordService.hashPassword(password);
+    const userData = {
+      name,
+      email,
+      password: hashedPassword,
+      phone: phone || null,
+      role: role || 'athlete',
+      sport: sportId,
+    };
 
-      // معالجة وحل الرياضة (تحويل النص إلى ObjectId إذا أرسل المستخدم اسماً مثل "Fitness")
-      let sportId = null;
-      if (role === 'coach' && sport) {
-        if (mongoose.Types.ObjectId.isValid(sport)) {
-          sportId = sport; // إذا كان أصلاً ObjectId جاهز
-        } else {
-          // البحث عن الرياضة في جدول Sport بالاسم أو الـ slug
-          const sportDoc = await Sport.findOne({ 
-            $or: [
-              { name: { $regex: new RegExp(`^${sport}$`, 'i') } }, 
-              { slug: sport.toLowerCase() }
-            ] 
-          });
-          
-          if (sportDoc) {
-            sportId = sportDoc._id;
-          } else {
-            const resp = error('Selected sport does not exist in the database', 400);
-            return res.status(resp.status).json(resp);
-          }
-        }
-      }
+    if (role === 'coach') {
+      userData.coachStatus = 'pending';
+      userData.age = age || null;
+      userData.experienceYears = experienceYears || null;
+      userData.workingDays = workingDays || [];
+      userData.workingHours = workingHours || null;
+      userData.certificates = certificates || [];
+      userData.bio = bio || null;
+    }
 
-      // بيانات أساسية للجميع
-      const userData = {
-        name,
-        email,
-        password: hashedPassword,
-        phone: phone || null,
-        role: role || 'athlete',
-        sport: sportId,  // ✅ الـ ObjectId السليم أو null للـ athlete
-      };
+    const user = await User.create(userData);
 
-      // بيانات إضافية للمدرب
-      if (role === 'coach') {
-        userData.coachStatus  = 'pending'; // ينتظر موافقة Admin
-        userData.age          = age || null;
-        userData.experienceYears = experienceYears || null;
-        userData.workingDays  = workingDays || [];
-        userData.workingHours = workingHours || null;
-        userData.certificates = certificates || [];
-        userData.bio          = bio || null;
-      }
+    const verifyToken = crypto.randomBytes(32).toString('hex');
+    await Token.create({
+      userId: user._id,
+      token: verifyToken,
+      type: 'emailVerify',
+      expiresAt: Date.now() + 60 * 60 * 1000,
+    });
 
-      const user = await User.create(userData);
+    // إرسال رابط يتجه للفرونت إند للتوثيق
+    const verificationUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/verify-email/${verifyToken}`;
 
-      // إنشاء توكن التحقق
-      const verifyToken = crypto.randomBytes(32).toString('hex');
-      await Token.create({
-        userId: user._id,
-        token: verifyToken,
-        type: 'emailVerify',
-        expiresAt: Date.now() + 60 * 60 * 1000,
-      });
+    // 🔴 التعديل هنا: تمرير Object بدلاً من القيم المتتالية مع قالب HTML
+    sendEmail({
+      to: email,
+      subject: 'Verify your email - SportsHub',
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2>Welcome to SportsHub, ${name}!</h2>
+          <p>Please verify your email address by clicking the button below:</p>
+          <a href="${verificationUrl}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Verify Email</a>
+          <p>Or copy and paste this link in your browser:</p>
+          <p><a href="${verificationUrl}">${verificationUrl}</a></p>
+        </div>
+      `,
+      text: `Click the link to verify your email: ${verificationUrl}`
+    }).catch((err) => {
+      console.error("Background email failed:", err.message);
+    });
 
-      const verificationUrl = `${process.env.BACKEND_URL || 'http://localhost:8000'}/api/auth/verify-email/${verifyToken}`;
+    logger.info('User registered', { userId: user._id, role: user.role });
 
-      // ✅ إرسال إيميل التحقق في الخلفية (بدون await) لكي لا يحدث Timeout
-      sendEmail(
-        email,
-        'Verify your email',
-        `Click the link to verify your email: ${verificationUrl}`
-      ).catch((err) => {
-        console.error("Background email failed:", err.message);
-      });
+    const message = role === 'coach'
+      ? 'Registered successfully. Your account is pending admin approval.'
+      : 'Registered successfully, verification email sent';
 
-      logger.info('User registered', { userId: user._id, role: user.role });
+    const userResponse = user.toObject();
+    delete userResponse.password;
 
-      const message = role === 'coach'
-        ? 'Registered successfully. Your account is pending admin approval.'
-        : 'Registered successfully, verification email sent';
-
-      // ✅ إرجاع اليوزر كامل (مع استثناء الـ password) ضمن الاستجابة
-      const userResponse = user.toObject();
-      delete userResponse.password;
-
-      const resp = success(userResponse, message);
-      return res.status(resp.status).json(resp);
+    const resp = success(userResponse, message);
+    return res.status(resp.status).json(resp);
   });
 
-// ─── LOGIN ────────────────────────────────────────────────────────────
+  // ─── LOGIN ────────────────────────────────────────────────────────────
   login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     const cacheKey = `login-attempts:${email}`;
@@ -163,7 +162,6 @@ class AuthController {
       return res.status(resp.status).json(resp);
     }
 
-    // auto-unlock
     if (user.isLocked && user.lockedUntil && user.lockedUntil < Date.now()) {
       user.isLocked = false;
       user.failedLoginAttempts = 0;
@@ -186,7 +184,7 @@ class AuthController {
     const isValid = await passwordService.verifyPassword(password, user.password);
     if (!isValid) {
       cache.set(cacheKey, attempts + 1, 900);
-      await this.handledFailedLogin(user);
+      await handleFailedLogin(user);
       await createLog({
         userId: user._id,
         role: user.role,
@@ -197,20 +195,18 @@ class AuthController {
       return res.status(resp.status).json(resp);
     }
 
-    // Coach pending — مو مسموح يدخل
     if (user.role === 'coach' && user.coachStatus === 'pending') {
       const resp = error('Your account is pending admin approval', 403);
       return res.status(resp.status).json(resp);
     }
 
-    // Coach rejected
     if (user.role === 'coach' && user.coachStatus === 'rejected') {
       const resp = error('Your coach request has been rejected', 403);
       return res.status(resp.status).json(resp);
     }
 
     cache.clear(cacheKey);
-    await this.resetFailedLoginAttemtps(user);
+    await resetFailedLoginAttempts(user);
 
     const payload = { id: user._id, role: user.role };
     const accessToken  = tokenService.genrateAccessToken(payload);
@@ -231,7 +227,6 @@ class AuthController {
       details: 'User logged in successfully',
     });
 
-    // ✅ إرجاع اليوزر كامل (مع استثناء الـ password) ضمن الاستجابة
     const userResponse = user.toObject();
     delete userResponse.password;
 
@@ -246,7 +241,6 @@ class AuthController {
   logout = asyncHandler(async (req, res) => {
     cookieService.clearTokens(res);
 
-    // تحديث الـ online status
     await User.updateOne(
       { _id: req.user.id },
       { $set: { isOnline: false, lastSeen: new Date() } }
@@ -347,13 +341,23 @@ class AuthController {
       expiresAt: Date.now() + 15 * 60 * 1000,
     });
 
-    const resetLink = `${process.env.CLIENT_URL}/reset-password/${rawToken}`;
+    const resetLink = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${rawToken}`;
 
-    await sendEmail(
-      email,
-      'Reset Your Password',
-      `Click this link to reset your password:\n\n${resetLink}`
-    );
+    // 🔴 التعديل هنا: استخدام Object مع قالب HTML
+    await sendEmail({
+      to: email,
+      subject: 'Reset Your Password - SportsHub',
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2>Password Reset Request</h2>
+          <p>You requested to reset your password. Click the button below to proceed:</p>
+          <a href="${resetLink}" style="background-color: #008CBA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a>
+          <p>This link is valid for 15 minutes only.</p>
+          <p>If you didn't request this, please ignore this email.</p>
+        </div>
+      `,
+      text: `Click this link to reset your password:\n\n${resetLink}`
+    });
 
     logger.info('Password reset requested', { userId: user._id });
 
