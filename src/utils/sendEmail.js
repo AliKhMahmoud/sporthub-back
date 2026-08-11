@@ -2,16 +2,18 @@ const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // استخدام SSL/TLS على المنفذ 465
+  port: 587,            // 🔑 التغيير هنا: استخدام 587 بدلاً من 465
+  secure: false,        // 🔑 تجعلها false لأن المنفذ 587 يترقى لـ TLS تلقائياً
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // App Password من حساب جوجل
+    pass: process.env.EMAIL_PASS,
   },
-  family: 4, // اجبار استخدام IPv4
+  tls: {
+    rejectUnauthorized: true, // الحفاظ على أمان الاتصال
+  },
 });
 
-// التحقق من صحة الإعدادات عند تشغيل السيرفر
+// التحقق من صحة الاتصال عند التشغيل
 transporter.verify((error) => {
   if (error) {
     console.error("❌ Nodemailer Transport Error:", error.message);
@@ -28,8 +30,8 @@ const sendEmail = async ({ to, subject, html, text }) => {
       from: `"SportsHub" <${process.env.EMAIL_USER}>`,
       to,
       subject,
-      text: text || "", // النص العادي كبديل
-      html: html || text, // محتوى الـ HTML
+      text: text || "",
+      html: html || text,
     });
 
     console.log("✅ Email sent successfully ID:", info.messageId);
