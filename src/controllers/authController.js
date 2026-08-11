@@ -109,7 +109,7 @@ class AuthController {
     });
 
     // إرسال رابط يتجه للفرونت إند للتوثيق
-    const verificationUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/verify-email/${verifyToken}`;
+    const verificationUrl = `${process.env.BACKEND_URL || 'http://localhost:5173'}/verify-email/${verifyToken}`;
 
     // 🔴 التعديل هنا: تمرير Object بدلاً من القيم المتتالية مع قالب HTML
     sendEmail({
