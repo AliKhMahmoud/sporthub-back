@@ -64,11 +64,17 @@ const registerSchema = Joi.object({
   // ─── Coach fields ──────────────────────────────────────────────────
   sport: Joi.when('role', {
     is: 'coach',
-    then: Joi.string().trim().min(2).max(50).required().messages({
-      'any.required': 'Sport is required for coach',
-      'string.min': 'Sport name must be at least 2 characters',
-    }),
-    otherwise: Joi.string().optional().allow(null, ''),
+    then: Joi.string()
+      .trim()
+      .hex()
+      .length(24)
+      .required()
+      .messages({
+        'any.required': 'Sport is required for coach',
+        'string.hex': 'Invalid sport ID format',
+        'string.length': 'Sport ID must be a valid ObjectId (24 characters)',
+      }),
+    otherwise: Joi.string().trim().hex().length(24).optional().allow(null, ''),
   }),
 
   age: Joi.when('role', {
