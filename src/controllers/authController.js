@@ -195,13 +195,26 @@ class AuthController {
       return res.status(resp.status).json(resp);
     }
 
+    // 🔴 1. التحقق من تفعيل البريد الإلكتروني (رياضي ومدرب)
+    if (!user.isVerified) {
+      await createLog({
+        userId: user._id,
+        role: user.role,
+        action: 'FAILED_LOGIN',
+        details: 'Attempted login without email verification',
+      });
+      const resp = error('Please verify your email address before logging in', 403, 'EMAIL_NOT_VERIFIED');
+      return res.status(resp.status).json(resp);
+    }
+
+    // 🔴 2. التحقق من حالة حساب المدرب
     if (user.role === 'coach' && user.coachStatus === 'pending') {
-      const resp = error('Your account is pending admin approval', 403);
+      const resp = error('Your account is pending admin approval', 403, 'COACH_PENDING');
       return res.status(resp.status).json(resp);
     }
 
     if (user.role === 'coach' && user.coachStatus === 'rejected') {
-      const resp = error('Your coach request has been rejected', 403);
+      const resp = error('Your coach request has been rejected', 403, 'COACH_REJECTED');
       return res.status(resp.status).json(resp);
     }
 

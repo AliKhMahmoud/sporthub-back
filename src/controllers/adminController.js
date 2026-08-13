@@ -18,7 +18,7 @@ class AdminController {
       role: 'coach',
       coachStatus: status,
     })
-      .populate('sport', 'name slug colorTheme') // 👈 تعديل اسم الحقل وجلب بيانات الرياضة
+      .populate('sport', 'name slug colorTheme')
       .select('name email sport age experienceYears workingDays workingHours certificates bio avatar createdAt coachStatus')
       .sort({ createdAt: -1 });
 
@@ -69,7 +69,7 @@ class AdminController {
 
   // PUT /api/admin/coach-requests/:id/reject
   rejectCoach = asyncHandler(async (req, res) => {
-    const { reason } = req.body; // 👈 إضافة إمكانية استقبال سبب الرفض
+    const { reason } = req.body;
     const coach = await User.findOne({ _id: req.params.id, role: 'coach' });
 
     if (!coach) {
@@ -113,6 +113,10 @@ class AdminController {
   getAllUsers = asyncHandler(async (req, res) => {
     const { role, page = 1, limit = 20 } = req.query;
 
+    // حماية وضبط قيم الـ Pagination لمنع القيم السالبة أو الصفر
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, parseInt(limit, 10) || 20);
+
     const filter = {};
     if (role) filter.role = role;
 
@@ -121,16 +125,16 @@ class AdminController {
       .populate('sport', 'name slug')
       .select('-password -__v')
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(Number(limit));
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum);
 
     const resp = success(
       {
         users,
         pagination: {
           total,
-          page: Number(page),
-          pages: Math.ceil(total / limit),
+          page: pageNum,
+          pages: Math.ceil(total / limitNum),
         },
       },
       'Users fetched successfully'
@@ -147,7 +151,13 @@ class AdminController {
       return res.status(resp.status).json(resp);
     }
 
-    // 👈 حماية: منع تعطيل الأدمن أو السوبر آدمن أو تعطيل الشخص لحسابه بنفسه
+    // 1. حماية: منع الأدمن من حظر حسابه الشخصي الحالي
+    if (user._id.toString() === req.user.id.toString()) {
+      const resp = error('You cannot deactivate your own account', 400);
+      return res.status(resp.status).json(resp);
+    }
+
+    // 2. حماية: منع تعطيل حسابات الأدمن الآخرين أو السوبر آدمن
     if (user.role === 'admin' || user.email === process.env.SUPERADMIN_EMAIL) {
       const resp = error('Cannot deactivate admin or superadmin accounts', 403);
       return res.status(resp.status).json(resp);
@@ -174,9 +184,9 @@ class AdminController {
       User.countDocuments({ role: 'coach', coachStatus: 'approved', isActive: true }),
       User.countDocuments({ role: 'coach', coachStatus: 'pending' }),
       User.countDocuments({ isActive: true }),
-      Post.countDocuments({ isActive: true }),        
-      Plan.countDocuments({ isActive: true }),       
-      AIPlan.countDocuments({ isDeleted: false }),   
+      Post.countDocuments({ isActive: true }),
+      Plan.countDocuments({ isActive: true }),
+      AIPlan.countDocuments({ isDeleted: false }),
     ]);
 
     const resp = success(
@@ -185,7 +195,7 @@ class AdminController {
         athletes, 
         coaches, 
         pendingCoaches, 
-        totalPosts,                         
+        totalPosts, 
         totalPlans: totalPlans + totalAIPlans 
       },
       'Stats fetched successfully'

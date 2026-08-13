@@ -168,3 +168,24 @@
 {"athleteId":"6a7ae4a380f2e3527888a36d","coachId":"6a732755177ccacd32ccfaa2","level":"info","message":"Training request accepted","requestId":"6a7ae53280f2e3527888a373","timestamp":"2026-08-11 12:06:31"}
 {"athlete":"6a7ae4a380f2e3527888a36d","coach":"6a732755177ccacd32ccfaa2","conversationId":"6a7b00ad5589cc2f40c49086","level":"info","message":"Conversation created","timestamp":"2026-08-11 13:59:57"}
 {"level":"info","message":"User registered","role":"coach","timestamp":"2026-08-11 15:04:43","userId":"6a7b0fda5cca968fc7177d2c"}
+{"adminId":"6a461fa490ef91a454bafd41","coachId":"6a7b0fda5cca968fc7177d2c","level":"info","message":"Coach approved","timestamp":"2026-08-11 15:28:56"}
+{"level":"info","message":"Avatar uploaded","timestamp":"2026-08-11 15:36:04","url":"https://res.cloudinary.com/dtetfjqgb/image/upload/v1786451706/sportshub/avatars/yvpmwh7x0spufcgffagg.jpg","userId":"6a461fa490ef91a454bafd41"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-13 08:43:53","userId":"6a7d5999007686c8b1d44176"}
+{"level":"info","message":"Email verified","timestamp":"2026-08-13 08:47:30","userId":"6a7d5999007686c8b1d44176"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-13 08:49:56","userId":"6a7d5b04007686c8b1d4417b"}
+{"level":"info","message":"User registered","role":"coach","timestamp":"2026-08-13 08:52:00","userId":"6a7d5b80007686c8b1d4417d"}
+{"level":"info","message":"Email verified","timestamp":"2026-08-13 08:52:15","userId":"6a7d5b80007686c8b1d4417d"}
+{"adminId":"6a461fa490ef91a454bafd41","coachId":"6a7d5b80007686c8b1d4417d","level":"info","message":"Coach approved","timestamp":"2026-08-13 08:53:28"}
+{"level":"info","message":"Password reset requested","timestamp":"2026-08-13 08:57:39","userId":"6a7d5b80007686c8b1d4417d"}
+{"level":"info","message":"Password reset completed","timestamp":"2026-08-13 08:58:20","userId":"6a7d5b80007686c8b1d4417d"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-13 09:00:03","userId":"6a7d5d63c8ee72ac4b466cb2"}
+{"level":"info","message":"Email verified","timestamp":"2026-08-13 09:07:19","userId":"6a7d5d63c8ee72ac4b466cb2"}
+{"level":"info","message":"Avatar uploaded","timestamp":"2026-08-13 09:15:08","url":"https://res.cloudinary.com/dtetfjqgb/image/upload/v1786601647/sportshub/avatars/ctssxcrlfiiofxyycinp.jpg","userId":"6a732755177ccacd32ccfaa2"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-13 09:37:44","userId":"6a7d66389bdd5c7eb6235d1d"}
+{"level":"info","message":"User registered","role":"coach","timestamp":"2026-08-13 09:39:34","userId":"6a7d66a69bdd5c7eb6235d1f"}
+{"adminId":"6a461fa490ef91a454bafd41","coachId":"6a7d66a69bdd5c7eb6235d1f","level":"info","message":"Coach rejected","timestamp":"2026-08-13 09:40:25"}
+{"level":"info","message":"User registered","role":"coach","timestamp":"2026-08-13 09:41:48","userId":"6a7d672c9bdd5c7eb6235d24"}
+{"adminId":"6a461fa490ef91a454bafd41","coachId":"6a7d672c9bdd5c7eb6235d24","level":"info","message":"Coach approved","timestamp":"2026-08-13 09:41:58"}
+{"coachId":"6a7d672c9bdd5c7eb6235d24","level":"info","message":"Plan created","planId":"6a7d67979bdd5c7eb6235d2a","timestamp":"2026-08-13 09:43:35"}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","level":"info","message":"Workout plan started","planId":"6a7d67979bdd5c7eb6235d2a","timestamp":"2026-08-13 09:45:15"}
+{"coachId":"6a7d672c9bdd5c7eb6235d24","level":"info","message":"Plan created","planId":"6a7d6b739bdd5c7eb6235d31","timestamp":"2026-08-13 10:00:03"}
