@@ -7,6 +7,7 @@ const logger = require('../utils/logger');
 const { success, error } = require('../utils/responseService');
 const { createLog } = require('../utils/ActivityLog');
 const { createNotification } = require('../utils/notificationService');
+const sendEmail = require('../utils/sendEmail');
 
 class AdminController {
 
@@ -51,6 +52,20 @@ class AdminController {
       link: '/dashboard',
     });
 
+    // إرسال إيميل بالقبول
+    sendEmail({
+      to: coach.email,
+      subject: 'Coach Account Approved - SportsHub',
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2>Congratulations ${coach.name}!</h2>
+          <p>Your request to become a certified coach on SportsHub has been approved.</p>
+          <p>You can now log in and start creating plans and training athletes.</p>
+        </div>
+      `,
+      text: `Congratulations ${coach.name}! Your coach account has been approved.`
+    }).catch((err) => logger.error("Coach approval email failed:", err.message));
+
     await createLog({
       userId: req.user.id,
       role: req.user.role,
@@ -85,19 +100,34 @@ class AdminController {
     coach.coachStatus = 'rejected';
     await coach.save();
 
+    const rejectMessage = reason ? `Your request was rejected. Reason: ${reason}` : 'Your coach account request has been rejected.';
+
     await createNotification({
       userId: coach._id,
       type: 'COACH_REJECTED',
-      title: 'Account Rejected',
-      message: reason ? `Your request was rejected. Reason: ${reason}` : 'Your coach account request has been rejected.',
+      title: 'Account Status Update',
+      message: rejectMessage,
       link: null,
     });
+
+    // إرسال إيميل بالرفض مباشرة للمدرب
+    sendEmail({
+      to: coach.email,
+      subject: 'Coach Application Status - SportsHub',
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2>Hello ${coach.name},</h2>
+          <p>${rejectMessage}</p>
+        </div>
+      `,
+      text: rejectMessage
+    }).catch((err) => logger.error("Coach rejection email failed:", err.message));
 
     await createLog({
       userId: req.user.id,
       role: req.user.role,
       action: 'REJECT_COACH',
-      details: `Admin rejected coach: ${coach.name} (${coach.email})`,
+      details: `Admin rejected coach: ${coach.name} (${coach.email}). Reason: ${reason || 'N/A'}`,
     });
 
     logger.info('Coach rejected', { coachId: coach._id, adminId: req.user.id });

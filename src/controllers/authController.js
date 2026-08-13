@@ -50,34 +50,26 @@ class AuthController {
       return res.status(resp.status).json(resp);
     }
 
-    if (role === 'coach' && !sport) {
-      const resp = error('Sport is required for coach', 400);
-      return res.status(resp.status).json(resp);
+    let sportId = null;
+
+    if (role === 'coach') {
+      if (!sport) {
+        const resp = error('Sport is required for coach', 400);
+        return res.status(resp.status).json(resp);
+      }
+
+      // التحقق مباشرة من وجود الرياضة بواسطة ObjectId المرسل من الفرونت إند
+      const sportDoc = await Sport.findById(sport);
+      if (!sportDoc) {
+        const resp = error('Selected sport does not exist', 400);
+        return res.status(resp.status).json(resp);
+      }
+
+      sportId = sportDoc._id;
     }
 
     passwordService.validatePasswordStrength(password);
     const hashedPassword = await passwordService.hashPassword(password);
-
-    let sportId = null;
-    if (role === 'coach' && sport) {
-      if (mongoose.Types.ObjectId.isValid(sport)) {
-        sportId = sport;
-      } else {
-        const sportDoc = await Sport.findOne({ 
-          $or: [
-            { name: { $regex: new RegExp(`^${sport}$`, 'i') } }, 
-            { slug: sport.toLowerCase() }
-          ] 
-        });
-        
-        if (sportDoc) {
-          sportId = sportDoc._id;
-        } else {
-          const resp = error('Selected sport does not exist in the database', 400);
-          return res.status(resp.status).json(resp);
-        }
-      }
-    }
 
     const userData = {
       name,
@@ -108,10 +100,8 @@ class AuthController {
       expiresAt: Date.now() + 60 * 60 * 1000,
     });
 
-    // إرسال رابط يتجه للفرونت إند للتوثيق
     const verificationUrl = `${process.env.BACKEND_URL}/api/auth/verify-email/${verifyToken}`;
 
-    // 🔴 التعديل هنا: تمرير Object بدلاً من القيم المتتالية مع قالب HTML
     sendEmail({
       to: email,
       subject: 'Verify your email - SportsHub',
@@ -213,6 +203,7 @@ class AuthController {
       return res.status(resp.status).json(resp);
     }
 
+    // 🔴 التعديل: جلب سبب الرفض من الإشعارات إن وجد وإرجاعه مع استجابة الخطأ
     if (user.role === 'coach' && user.coachStatus === 'rejected') {
       const resp = error('Your coach request has been rejected', 403, 'COACH_REJECTED');
       return res.status(resp.status).json(resp);
