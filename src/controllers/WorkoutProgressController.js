@@ -9,7 +9,7 @@ const { createLog } = require('../utils/ActivityLog');
 class WorkoutProgressController {
 
   // POST /api/workout-progress/start
-  // الرياضي يضغط "Begin Workout" لبدء الخطة
+  // الرياضي يضغط "Begin Workout" أو "Restart Workout"
   startPlan = asyncHandler(async (req, res) => {
     const { planId } = req.body;
     const athleteId = req.user.id;
@@ -21,20 +21,38 @@ class WorkoutProgressController {
       return res.status(resp.status).json(resp);
     }
 
-    // 2. التحقق إن كان الرياضي قد بدأ نفس الخطة ولديه سجل "قيد التنفيذ" مسبقاً
-    const existingProgress = await WorkoutProgress.findOne({
+    // 2. البحث عن سجل تقدم سابق (In-progress أو Completed) لعمل إعادة تعيين (Reset)
+    let workoutProgress = await WorkoutProgress.findOne({
       athlete: athleteId,
       plan: planId,
-      status: 'in-progress',
-    });
+    }).sort({ createdAt: -1 });
 
-    if (existingProgress) {
-      const resp = error('You have already started this plan and it is still in progress', 400);
-      return res.status(resp.status).json(resp);
+    if (workoutProgress) {
+      // إذا كان يوجد تقدم سابق، نقوم بإعادة ضبط السجل (Restart)
+      workoutProgress.status = 'in-progress';
+      workoutProgress.completedExercises = [];
+      workoutProgress.progressPercentage = 0;
+      workoutProgress.startedAt = new Date();
+      workoutProgress.completedAt = null;
+
+      await workoutProgress.save();
+
+      // تسجيل النشاط (Restart)
+      await createLog({
+        userId: athleteId,
+        role: req.user.role,
+        action: 'RESTART_WORKOUT_PLAN',
+        details: `Athlete restarted workout plan: ${plan.title}`,
+      });
+
+      logger.info('Workout plan restarted', { athleteId, planId: plan._id });
+
+      const resp = success(workoutProgress, 'Workout plan restarted successfully');
+      return res.status(200).json(resp);
     }
 
-    // 3. إنشاء سجل تتبع جديد للخطة
-    const workoutProgress = await WorkoutProgress.create({
+    // 3. إنشاء سجل تتبع جديد إذا لم يكن هناك سجل سابق
+    workoutProgress = await WorkoutProgress.create({
       athlete: athleteId,
       plan: plan._id,
       sport: plan.sport,
@@ -44,7 +62,7 @@ class WorkoutProgressController {
       startedAt: new Date(),
     });
 
-    // 4. تسجيل النشاط (Activity Log)
+    // 4. تسجيل النشاط (Start)
     await createLog({
       userId: athleteId,
       role: req.user.role,
@@ -66,8 +84,8 @@ class WorkoutProgressController {
     const progress = await WorkoutProgress.findOne({
       athlete: req.user.id,
       plan: planId,
-      status: { $in: ['in-progress', 'completed'] }, // ✅ يبحث عن الحالتين معاً
-    }).sort({ createdAt: -1 }).populate('plan', 'title description exercises'); // يجلب الأحدث
+      status: { $in: ['in-progress', 'completed'] },
+    }).sort({ createdAt: -1 }).populate('plan', 'title description exercises');
 
     if (!progress) {
       const resp = error('No active progress found for this plan', 404);
@@ -81,7 +99,7 @@ class WorkoutProgressController {
   // PATCH /api/workout-progress/:id/exercise
   // الرياضي يضغط على تمرين معين ليضع عليه "صح" (Check) أو يلغيه
   toggleExerciseCompletion = asyncHandler(async (req, res) => {
-    const { exerciseName } = req.body; // أو الـ index حسب ما تفضل بالفرونت
+    const { exerciseName } = req.body;
     const progressId = req.params.id;
 
     const workoutProgress = await WorkoutProgress.findById(progressId).populate('plan');
@@ -97,12 +115,7 @@ class WorkoutProgressController {
       return res.status(resp.status).json(resp);
     }
 
-    if (workoutProgress.status !== 'in-progress') {
-      const resp = error('This plan is no longer in progress', 400);
-      return res.status(resp.status).json(resp);
-    }
-
-    // تبديل حالة التمرين (إذا موجود نحذفه، إذا غير موجود نضيفه)
+    // التبديل بين إكمال التمرين وإلغائه
     const index = workoutProgress.completedExercises.indexOf(exerciseName);
     if (index > -1) {
       workoutProgress.completedExercises.splice(index, 1);
@@ -110,7 +123,7 @@ class WorkoutProgressController {
       workoutProgress.completedExercises.push(exerciseName);
     }
 
-    // حساب نسبة الإنجاز تلقائياً بناءً على عدد التمارين الكلي في الخطة
+    // حساب نسبة الإنجاز
     const totalExercises = workoutProgress.plan.exercises.length;
     if (totalExercises > 0) {
       const completedCount = workoutProgress.completedExercises.length;
@@ -119,10 +132,13 @@ class WorkoutProgressController {
       workoutProgress.progressPercentage = 0;
     }
 
-    // إذا اكتملت كل التمارين، يمكننا تحديث الحالة تلقائياً إلى completed (اختياري)
+    // تحديث الحالة بحسب النسبة
     if (workoutProgress.progressPercentage === 100) {
       workoutProgress.status = 'completed';
       workoutProgress.completedAt = new Date();
+    } else {
+      workoutProgress.status = 'in-progress';
+      workoutProgress.completedAt = null;
     }
 
     await workoutProgress.save();

@@ -5,7 +5,7 @@ const addProgressSchema = Joi.object({
     'any.required': 'User ID is required',
     'string.length': 'Invalid user ID',
   }),
-  
+
   sportId: Joi.string().hex().length(24).required().messages({
     'any.required': 'Sport is required',
     'string.length': 'Invalid sport ID',

@@ -1,4 +1,4 @@
-const User = require('../models/User'); // ✅ ناقص هاد
+const User = require('../models/User');
 const Progress = require('../models/Progress');
 const Sport = require('../models/Sport');
 const asyncHandler = require('../utils/asyncHandler');
@@ -10,9 +10,8 @@ const { createLog } = require('../utils/ActivityLog');
 class ProgressController {
 
   // POST /api/progress
-  // المستخدم يسجل تقدم جديد
-   addProgress = asyncHandler(async (req, res) => {
-
+  // الكوتش يسجل تقدم لمتدرب تابع له
+  addProgress = asyncHandler(async (req, res) => {
     const { sportId, metric, value, note, recordedAt, userId: traineeId } = req.body;
 
     // ✅ check sport
@@ -22,7 +21,7 @@ class ProgressController {
       return res.status(resp.status).json(resp);
     }
 
-    // ✅ FIXED: جلب المستخدم أولاً ثم التحقق
+    // ✅ جلب المستخدم والتحقق
     const trainee = await User.findById(traineeId);
 
     if (!trainee) {
@@ -35,10 +34,11 @@ class ProgressController {
       return res.status(resp.status).json(resp);
     }
 
-    // if (trainee.coach.toString() !== req.user.id.toString()) {
-    //   const resp = error('This user is not your trainee', 403);
-    //   return res.status(resp.status).json(resp);
-    // }
+    // ✅ تم إعادة تفعيل الشرط مع إعطاء صلاحية للـ Admin إذا احتاج الإضافة
+    if (trainee.coach.toString() !== req.user.id.toString() && req.user.role !== 'admin') {
+      const resp = error('This user is not assigned to you', 403);
+      return res.status(resp.status).json(resp);
+    }
 
     const progress = await Progress.create({
       user: trainee._id,
@@ -61,33 +61,32 @@ class ProgressController {
       coachId: req.user.id,
       traineeId: trainee._id,
       metric,
-      value
+      value,
     });
 
     const resp = success(progress, 'Progress recorded successfully');
     return res.status(201).json({ ...resp, status: 201 });
   });
-  
+
+  // GET /api/progress
   getAllTraineesProgress = asyncHandler(async (req, res) => {
     // 1. جلب كل المستخدمين (المتدربين) التابعين لهذا الكوتش
     const trainees = await User.find({ coach: req.user.id }).select('_id');
-    const traineeIds = trainees.map(t => t._id);
+    const traineeIds = trainees.map((t) => t._id);
 
     // 2. جلب كل سجلات التقدم الخاصة بهؤلاء المتدربين
     const records = await Progress.find({ user: { $in: traineeIds } })
-      .populate('user', 'name email avatar') // جلب معلومات المتدرب
+      .populate('user', 'name email avatar')
       .populate('sport', 'name slug colorTheme')
       .populate('trackedBy', 'name role')
       .select('-__v')
-      .sort({ recordedAt: -1 }); // الأحدث أولاً
+      .sort({ recordedAt: -1 });
 
     const resp = success(records, 'All trainees progress fetched successfully');
     return res.status(resp.status).json(resp);
   });
 
-
   // GET /api/progress/me?sport=slug&metric=weight
-  // المستخدم يجيب كل تقدمه مع فلترة اختيارية
   getMyProgress = asyncHandler(async (req, res) => {
     const { sport: sportSlug, metric } = req.query;
 
@@ -107,17 +106,16 @@ class ProgressController {
     const records = await Progress.find(filter)
       .populate('sport', 'name slug colorTheme')
       .select('-__v')
-      .sort({ recordedAt: 1 }); // تصاعدي للرسم البياني
+      .sort({ recordedAt: 1 });
 
     const resp = success(records, 'Progress fetched successfully');
     return res.status(resp.status).json(resp);
   });
 
-  // الكوتش يجلب تقدم أحد متدربيه
+  // GET /api/progress/trainee/:traineeId
   getProgressByTrainee = asyncHandler(async (req, res) => {
     const { traineeId } = req.params;
 
-    // التأكد أن المتدرب تابع لهذا الكوتش
     const trainee = await User.findOne({ _id: traineeId, coach: req.user.id });
     if (!trainee) {
       const resp = error('Trainee not found or not assigned to you', 404);
@@ -135,11 +133,11 @@ class ProgressController {
   });
 
   // GET /api/progress/me/stats?sport=slug
-  // إحصائيات للرسوم البيانية بالـ Profile
   getMyStats = asyncHandler(async (req, res) => {
     const { sport: sportSlug } = req.query;
 
-    const filter = { user: req.user.id };
+    // ✅ تم تحويل الـ user.id لـ ObjectId صراحة ليعمل مع aggregate
+    const filter = { user: new mongoose.Types.ObjectId(req.user.id) };
 
     if (sportSlug) {
       const sport = await Sport.findOne({ slug: sportSlug, isActive: true });
@@ -147,10 +145,10 @@ class ProgressController {
         const resp = error('Sport not found', 404);
         return res.status(resp.status).json(resp);
       }
-      filter.sport = sport._id;
+      // ✅ تم تحويل sport._id أيضاً لـ ObjectId
+      filter.sport = new mongoose.Types.ObjectId(sport._id);
     }
 
-    // تجميع البيانات حسب الـ metric
     const stats = await Progress.aggregate([
       { $match: filter },
       {
@@ -175,7 +173,6 @@ class ProgressController {
   });
 
   // DELETE /api/progress/:id
-  // المستخدم يحذف سجل تقدمه
   deleteProgress = asyncHandler(async (req, res) => {
     const progress = await Progress.findById(req.params.id);
 
@@ -184,9 +181,9 @@ class ProgressController {
       return res.status(resp.status).json(resp);
     }
 
-    // السماح بالحذف إذا كان المستخدم هو نفس المتدرب، أو إذا كان هو الكوتش الذي قام بتسجيله
     const isOwner = progress.user.toString() === req.user.id.toString();
-    const isTrackerCoach = progress.trackedBy && progress.trackedBy.toString() === req.user.id.toString();
+    const isTrackerCoach =
+      progress.trackedBy && progress.trackedBy.toString() === req.user.id.toString();
 
     if (!isOwner && !isTrackerCoach) {
       const resp = error('You are not authorized to delete this record', 403);

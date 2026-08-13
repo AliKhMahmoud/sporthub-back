@@ -194,3 +194,17 @@
 {"level":"info","message":"Cover uploaded","timestamp":"2026-08-12 20:27:40","url":"https://res.cloudinary.com/dtetfjqgb/image/upload/v1786555650/sportshub/covers/wzhldg2awit5flyakkqw.jpg","userId":"6a461fa490ef91a454bafd41"}
 {"level":"info","message":"Avatar uploaded","timestamp":"2026-08-12 20:27:47","url":"https://res.cloudinary.com/dtetfjqgb/image/upload/v1786555657/sportshub/avatars/hyzga5k3qw0wtgv5u0al.jpg","userId":"6a461fa490ef91a454bafd41"}
 >>>>>>> d17072ff6e97dcbdbbee044e069e1ffe4b44371d
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","coachId":"6a7d672c9bdd5c7eb6235d24","level":"info","message":"Training request sent","timestamp":"2026-08-13 10:26:46"}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","coachId":"6a7d672c9bdd5c7eb6235d24","level":"info","message":"Training request accepted","requestId":"6a7d71b65fad80e0c40b98c4","timestamp":"2026-08-13 10:26:58"}
+{"athlete":"6a7d5d63c8ee72ac4b466cb2","coach":"6a7d672c9bdd5c7eb6235d24","conversationId":"6a7d71ce5fad80e0c40b98c9","level":"info","message":"Conversation created","timestamp":"2026-08-13 10:27:10"}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","exercises":3,"level":"info","message":"AI plan created","planId":"6a7d7273fafc03a2dd670103","sport":"cardio-fitness","timestamp":"2026-08-13 10:29:56"}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","level":"info","message":"Workout plan restarted","planId":"6a7d67979bdd5c7eb6235d2a","timestamp":"2026-08-13 11:13:51"}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","level":"info","message":"Workout plan restarted","planId":"6a7d67979bdd5c7eb6235d2a","timestamp":"2026-08-13 11:14:01"}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","level":"info","message":"Workout plan started","planId":"6a76f221ad65db0e85ae4e16","timestamp":"2026-08-13 11:14:30"}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","level":"info","message":"Workout plan restarted","planId":"6a76f221ad65db0e85ae4e16","timestamp":"2026-08-13 11:14:37"}
+{"coachId":"6a7d672c9bdd5c7eb6235d24","level":"info","message":"Progress added","metric":"time","timestamp":"2026-08-13 11:54:39","traineeId":"6a7d5d63c8ee72ac4b466cb2","value":88}
+{"coachId":"6a7d672c9bdd5c7eb6235d24","level":"info","message":"Progress added","metric":"reps","timestamp":"2026-08-13 11:58:25","traineeId":"6a7d5d63c8ee72ac4b466cb2","value":99}
+{"coachId":"6a7d672c9bdd5c7eb6235d24","level":"info","message":"Progress added","metric":"reps","timestamp":"2026-08-13 11:58:38","traineeId":"6a7d5d63c8ee72ac4b466cb2","value":99}
+{"coachId":"6a7d672c9bdd5c7eb6235d24","level":"info","message":"Progress added","metric":"reps","timestamp":"2026-08-13 11:58:49","traineeId":"6a7d5d63c8ee72ac4b466cb2","value":99}
+{"coachId":"6a7d672c9bdd5c7eb6235d24","level":"info","message":"Progress added","metric":"weight","timestamp":"2026-08-13 12:02:21","traineeId":"6a7d5d63c8ee72ac4b466cb2","value":77}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","exercises":3,"level":"info","message":"AI plan created","planId":"6a7d884385cb4a2cd78f639e","sport":"cardio-fitness","timestamp":"2026-08-13 12:02:59"}

@@ -10,26 +10,11 @@ const { createLog } = require('../utils/ActivityLog');
 class ProfileController {
 
   // GET /api/profile/me
-  // المستخدم يجيب بياناته الكاملة
   getMyProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id)
       .populate('sport', 'name slug colorTheme')
       .select(`
-        name
-        email
-        role
-        phone
-        avatar
-        cover
-        bio
-        height
-        weight
-        sport
-        isActive
-        isVerified
-        createdAt
-        updatedAt
-        lastLogin
+        name email role phone avatar cover bio height weight sport isActive isVerified createdAt updatedAt lastLogin
       `);
 
     if (!user) {
@@ -45,15 +30,12 @@ class ProfileController {
       phone: user.phone,
       avatar: user.avatar,
       cover: user.cover,
-
       sport: user.sport,
-
       profile: {
         bio: user.bio,
         height: user.height,
         weight: user.weight,
       },
-
       meta: {
         isActive: user.isActive,
         isVerified: user.isVerified,
@@ -68,7 +50,6 @@ class ProfileController {
   });
 
   // GET /api/profile/:id
-  // Public — عرض بروفايل مستخدم
   getProfileById = asyncHandler(async (req, res) => {
     const user = await User.findOne({
       _id: req.params.id,
@@ -97,25 +78,19 @@ class ProfileController {
       avatar: user.avatar,
       cover: user.cover,
       role: user.role,
-
       sport: user.sport,
-
       profile: {
         bio: user.bio,
         height: user.height,
         weight: user.weight,
       },
-
       meta: {
         createdAt: user.createdAt,
       },
     };
 
     const resp = success(
-      {
-        user: formattedProfile,
-        posts,
-      },
+      { user: formattedProfile, posts },
       'Profile fetched successfully'
     );
 
@@ -123,9 +98,10 @@ class ProfileController {
   });
 
   // PUT /api/profile/me
-  // المستخدم يعدل بياناته الشخصية فقط
+  // المستخدم يعدل بياناته الشخصية
   updateMyProfile = asyncHandler(async (req, res) => {
-    const { name, about, phone, height, weight } = req.body;
+    // 1. دعم استقبال bio أو about سواء أتت مباشرة أو داخل كائن profile
+    const { name, about, bio, profile, phone, height, weight } = req.body;
 
     const user = await User.findById(req.user.id);
     if (!user) {
@@ -133,8 +109,11 @@ class ProfileController {
       return res.status(resp.status).json(resp);
     }
 
+    // تحديد قيمة bio المطلوبة مع التأكد من مختلف الاحتمالات
+    const updatedBio = bio ?? about ?? profile?.bio;
+
     if (name !== undefined) user.name = name;
-    if (about !== undefined) user.bio = about;
+    if (updatedBio !== undefined) user.bio = updatedBio;
     if (phone !== undefined) user.phone = phone;
     if (height !== undefined) user.height = height;
     if (weight !== undefined) user.weight = weight;
@@ -148,15 +127,19 @@ class ProfileController {
       details: 'User updated their profile information',
     });
 
+    // 2. توحيد الهيكلية المرجعة مع getMyProfile لتسهيل التعامل في Frontend
     const resp = success(
       {
+        _id: user._id,
         name: user.name,
-        about: user.bio,
         phone: user.phone,
         avatar: user.avatar,
         cover: user.cover,
-        height: user.height,
-        weight: user.weight,
+        profile: {
+          bio: user.bio,
+          height: user.height,
+          weight: user.weight,
+        },
       },
       'Profile updated successfully'
     );
@@ -173,8 +156,8 @@ class ProfileController {
       .sort({ createdAt: -1 });
 
     const totalPosts = posts.length;
-    const totalLikes = posts.reduce((sum, p) => sum + p.likes.length, 0);
-    const totalViews = posts.reduce((sum, p) => sum + p.views, 0);
+    const totalLikes = posts.reduce((sum, p) => sum + (p.likes?.length || 0), 0);
+    const totalViews = posts.reduce((sum, p) => sum + (p.views || 0), 0);
 
     let plans = [];
     if (req.user.role === 'coach') {
@@ -238,6 +221,7 @@ class ProfileController {
     return res.status(resp.status).json(resp);
   });
 
+  // PUT /api/profile/assign-sport
   assignSport = asyncHandler(async (req, res) => {
     const { sportId } = req.body;
 

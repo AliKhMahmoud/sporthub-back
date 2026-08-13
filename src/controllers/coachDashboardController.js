@@ -1,15 +1,12 @@
 const TrainingRequest = require('../models/TrainingRequest');
 const AIPlan = require('../models/AIPlan');
 const User = require('../models/User');
-const Post = require('../models/Post');
-const Plan   = require('../models/Plan');
 const asyncHandler = require('../utils/asyncHandler');
-const { success, error } = require('../utils/responseService');
+const { success } = require('../utils/responseService');
 
 class CoachDashboardController {
 
   // GET /api/dashboard/coach
-  // كل بيانات Dashboard المدرب دفعة وحدة
   getDashboard = asyncHandler(async (req, res) => {
     const coachId = req.user.id;
 
@@ -33,8 +30,9 @@ class CoachDashboardController {
         status: 'accepted',
       }),
 
-      // خطط AI تنتظر المراجعة
+      // خطط AI تنتظر المراجعة للمدرب الحالي فقط
       AIPlan.countDocuments({
+        coach: coachId, // 🟢 تم التعديل
         status: 'Pending Coach Review',
         isDeleted: false,
       }),
@@ -46,8 +44,9 @@ class CoachDashboardController {
         .sort({ createdAt: -1 })
         .limit(5),
 
-      // آخر 5 خطط AI تنتظر المراجعة
+      // آخر 5 خطط AI تنتظر المراجعة للمدرب الحالي فقط
       AIPlan.find({
+        coach: coachId, // 🟢 تم التعديل
         status: 'Pending Coach Review',
         isDeleted: false,
       })
@@ -73,7 +72,6 @@ class CoachDashboardController {
   });
 
   // GET /api/dashboard/coach/trainees
-  // قائمة متدربي المدرب
   getMyTrainees = asyncHandler(async (req, res) => {
     const trainees = await User.find({
       coach: req.user.id,
@@ -88,9 +86,9 @@ class CoachDashboardController {
   });
 
   // GET /api/dashboard/coach/ai-plans
-  // خطط AI تنتظر مراجعة المدرب
   getPendingAIPlans = asyncHandler(async (req, res) => {
     const plans = await AIPlan.find({
+      coach: req.user.id, // 🟢 تم التعديل
       status: 'Pending Coach Review',
       isDeleted: false,
     })
@@ -103,7 +101,6 @@ class CoachDashboardController {
   });
 
   // GET /api/dashboard/coach/requests
-  // طلبات التدريب مع فلترة
   getTrainingRequests = asyncHandler(async (req, res) => {
     const { status } = req.query;
 
