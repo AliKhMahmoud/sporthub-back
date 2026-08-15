@@ -19,7 +19,6 @@ class CoachController {
         const mongoose = require('mongoose');
 
         let sportDoc;
-        // نتحقق إذا كان ما تم إرساله هو ObjectId حقيقي أو slug نصي
         if (mongoose.Types.ObjectId.isValid(sport)) {
           sportDoc = await Sport.findOne({ _id: sport, isActive: true }).select('_id');
         } else {
@@ -31,12 +30,12 @@ class CoachController {
           return res.status(resp.status).json(resp);
         }
         
-        // الاعتماد حصراً على حقل sport
         filter.sport = sportDoc._id;
       }
 
       const coaches = await User.find(filter)
-        .select('name avatar bio cover sport age experienceYears workingDays workingHours certificates isOnline lastSeen createdAt')
+        // 🟢 أضفنا phone هنا
+        .select('name phone avatar bio cover sport age experienceYears workingDays workingHours certificates isOnline lastSeen createdAt')
         .populate('sport', 'name slug colorTheme')
         .sort({ experienceYears: -1 });
 
@@ -45,7 +44,6 @@ class CoachController {
   });
 
   // GET /api/coaches/:id
-  // Public — تفاصيل مدرب وحد + إحصائياته
   getCoachById = asyncHandler(async (req, res) => {
     const coach = await User.findOne({
       _id:         req.params.id,
@@ -53,7 +51,8 @@ class CoachController {
       coachStatus: 'approved',
       isActive:    true,
     })
-      .select('name avatar bio cover sport age experienceYears workingDays workingHours certificates isOnline lastSeen createdAt')
+      // 🟢 أضفنا phone هنا أيضاً
+      .select('name phone avatar bio cover sport age experienceYears workingDays workingHours certificates isOnline lastSeen createdAt')
       .populate('sport', 'name slug colorTheme');
 
     if (!coach) {
@@ -61,7 +60,6 @@ class CoachController {
       return res.status(resp.status).json(resp);
     }
 
-    // إحصائيات سريعة
     const totalTrainees = await TrainingRequest.countDocuments({
       coach:  coach._id,
       status: 'accepted',
