@@ -209,3 +209,5 @@
 {"coachId":"6a7d672c9bdd5c7eb6235d24","level":"info","message":"Progress added","metric":"weight","timestamp":"2026-08-13 12:02:21","traineeId":"6a7d5d63c8ee72ac4b466cb2","value":77}
 {"athleteId":"6a7d5d63c8ee72ac4b466cb2","exercises":3,"level":"info","message":"AI plan created","planId":"6a7d884385cb4a2cd78f639e","sport":"cardio-fitness","timestamp":"2026-08-13 12:02:59"}
 {"coachId":"6a732755177ccacd32ccfaa2","level":"info","message":"Plan created","planId":"6a8005e88800385ea091a203","timestamp":"2026-08-15 09:23:36"}
+{"coachId":"6a732755177ccacd32ccfaa2","level":"info","message":"Plan created","planId":"6a800ad928d61eb1aa228dfe","timestamp":"2026-08-15 09:44:41"}
+{"level":"info","message":"Post created","postId":"6a8017c428d61eb1aa228e11","timestamp":"2026-08-15 10:39:48","userId":"6a732755177ccacd32ccfaa2"}
