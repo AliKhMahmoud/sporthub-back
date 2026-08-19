@@ -77,31 +77,36 @@ class AIPlanController {
 
   // GET /api/ai-plans
   // Athlete — يجيب خططه | Coach — يجيب الخطط pending | Admin — الكل
+  // GET /api/ai-plans
+// Athlete — يجيب خططه | Coach — يجيب الخطط all (مو بس pending) | Admin — الكل
   getPlans = asyncHandler(async (req, res) => {
-    const { status } = req.query;
-    let filter = { isDeleted: false };
+      const { status } = req.query;
+      let filter = { isDeleted: false };
 
-    if (req.user.role === 'athlete') {
-      filter.athlete = req.user.id;
-      if (status) filter.status = status;
+      if (req.user.role === 'athlete') {
+        filter.athlete = req.user.id;
+        if (status) filter.status = status;
 
-    } else if (req.user.role === 'coach') {
-      filter.reviewedBy = { $in: [null, req.user.id] };
-      filter.status = status || 'Pending Coach Review';
+      } else if (req.user.role === 'coach') {
+        // ✅ جديد: يجيب كل الخطط (pending + approved + rejected)
+        // بس اللي بتاعتو أو pending ما حتها أحد
+        filter.reviewedBy = { $in: [null, req.user.id] };
+        // ❌ حذفنا الـ default status!
+        if (status) filter.status = status; // لو مرّى status فقط بعدها
 
-    } else if (req.user.role === 'admin') {
-      if (status) filter.status = status;
-    }
+      } else if (req.user.role === 'admin') {
+        if (status) filter.status = status;
+      }
 
-    const plans = await AIPlan.find(filter)
-      .populate('athlete',    'name avatar')
-      .populate('sport',      'name slug')        // ✅ أضفنا sport populate
-      .populate('reviewedBy', 'name')
-      .select('-__v')
-      .sort({ createdAt: -1 });
+      const plans = await AIPlan.find(filter)
+        .populate('athlete',    'name avatar')
+        .populate('sport',      'name slug')
+        .populate('reviewedBy', 'name')
+        .select('-__v')
+        .sort({ createdAt: -1 });
 
-    const resp = success(plans, 'AI plans fetched successfully');
-    return res.status(resp.status).json(resp);
+      const resp = success(plans, 'AI plans fetched successfully');
+      return res.status(resp.status).json(resp);
   });
 
   // GET /api/ai-plans/:id
