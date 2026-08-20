@@ -217,3 +217,24 @@
 {"athleteId":"6a7d5d63c8ee72ac4b466cb2","exercises":3,"level":"info","message":"AI plan created","planId":"6a8543605a22d3f5b3a7f61b","sport":"taekwondo","timestamp":"2026-08-19 08:47:12"}
 {"athleteId":"6a7d5d63c8ee72ac4b466cb2","exercises":3,"level":"info","message":"AI plan created","planId":"6a8549015a22d3f5b3a7f688","sport":"taekwondo","timestamp":"2026-08-19 09:11:13"}
 {"athleteId":"6a7d5d63c8ee72ac4b466cb2","exercises":3,"level":"info","message":"AI plan created","planId":"6a854ad843bc181f404d1b5e","sport":"taekwondo","timestamp":"2026-08-19 09:19:04"}
+{"coachId":"6a732755177ccacd32ccfaa2","level":"info","message":"Plan created","planId":"6a869610d898e25b81a89d34","timestamp":"2026-08-20 08:52:16"}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","level":"info","message":"Workout plan started","planId":"6a869610d898e25b81a89d34","timestamp":"2026-08-20 08:52:29"}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","level":"info","message":"Workout plan started","planId":"6a4a12e31d6561dc1cecc10a","timestamp":"2026-08-20 08:54:59"}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","level":"info","message":"Workout plan started","planId":"6a85ecb280145a2bff080f8e","timestamp":"2026-08-20 08:55:18"}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","level":"info","message":"Workout plan started","planId":"6a85ec7780145a2bff080f8c","timestamp":"2026-08-20 08:55:23"}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","level":"info","message":"Workout plan restarted","planId":"6a85ec7780145a2bff080f8c","timestamp":"2026-08-20 08:55:23"}
+{"athleteId":"6a7d5d63c8ee72ac4b466cb2","level":"info","message":"Workout plan started","planId":"6a82dff28897f381092bf730","timestamp":"2026-08-20 08:55:28"}
+{"level":"info","message":"User registered","role":"athlete","timestamp":"2026-08-20 09:01:20","userId":"6a86982f42ceae01a4e407ad"}
+{"athleteId":"6a86982f42ceae01a4e407ad","coachId":"6a732755177ccacd32ccfaa2","level":"info","message":"Training request sent","timestamp":"2026-08-20 09:02:42"}
+{"athleteId":"6a86982f42ceae01a4e407ad","coachId":"6a732755177ccacd32ccfaa2","level":"info","message":"Training request accepted","requestId":"6a86988142ceae01a4e407b0","timestamp":"2026-08-20 09:10:54"}
+{"athleteId":"6a86982f42ceae01a4e407ad","level":"info","message":"Workout plan started","planId":"6a869610d898e25b81a89d34","timestamp":"2026-08-20 09:11:50"}
+{"athleteId":"6a86982f42ceae01a4e407ad","exercises":3,"level":"info","message":"AI plan created","planId":"6a869b0342ceae01a4e408a6","sport":"taekwondo","timestamp":"2026-08-20 09:13:23"}
+{"level":"info","message":"Post created","postId":"6a86a52ced0ae8b99555663c","timestamp":"2026-08-20 09:56:44","userId":"6a732755177ccacd32ccfaa2"}
+{"athleteId":"6a86982f42ceae01a4e407ad","exercises":3,"level":"info","message":"AI plan created","planId":"6a86a87376a50844cc1184c2","sport":"taekwondo","timestamp":"2026-08-20 10:10:44"}
+{"level":"info","message":"Post created","postId":"6a86ac56e08ee1e4bf0db39d","timestamp":"2026-08-20 10:27:19","userId":"6a732755177ccacd32ccfaa2"}
+{"athleteId":"6a86982f42ceae01a4e407ad","level":"info","message":"Workout plan started","planId":"6a76f214ad65db0e85ae4e14","timestamp":"2026-08-20 10:37:40"}
+{"athleteId":"6a85df4c9aefbd0c4b67a6d9","level":"info","message":"Workout plan started","planId":"6a76f214ad65db0e85ae4e14","timestamp":"2026-08-20 10:41:11"}
+{"coachId":"6a82d3c58897f381092bf70b","level":"info","message":"Progress added","metric":"weight","timestamp":"2026-08-20 10:46:15","traineeId":"6a85df4c9aefbd0c4b67a6d9","value":77}
+{"coachId":"6a82d3c58897f381092bf70b","level":"info","message":"Plan created","planId":"6a86b57cbef29e4e11fd68bc","timestamp":"2026-08-20 11:06:21"}
+{"coachId":"6a82d3c58897f381092bf70b","level":"info","message":"Plan created","planId":"6a86b59cbef29e4e11fd68bf","timestamp":"2026-08-20 11:06:52"}
+{"coachId":"6a82d3c58897f381092bf70b","level":"info","message":"Progress added","metric":"weight","timestamp":"2026-08-20 11:17:54","traineeId":"6a85df4c9aefbd0c4b67a6d9","value":77}

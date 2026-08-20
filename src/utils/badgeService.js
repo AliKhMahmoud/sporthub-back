@@ -1,5 +1,4 @@
 // src/utils/badgeService.js
-// منطق منح الشارات — كل شارة عندها شرط واضح
 
 // ─── تعريف الشارات ─────────────────────────────────────────────────────────
 const BADGES = {
@@ -41,7 +40,7 @@ const BADGES = {
   },
   COACHES_PICK: {
     id:          'COACHES_PICK',
-    name:        "Coach's Pick",
+    name:        'Coachs Pick',
     description: 'Received a 5-star rating from a coach',
     icon:        '👑',
   },
@@ -70,7 +69,7 @@ const LEVEL_TITLES = {
 };
 
 // ─── حساب المستوى من XP ──────────────────────────────────────────────────────
-const getLevelFromXP = (xp) => {
+const getLevelFromXP = (xp = 0) => {
   let level = 1;
   for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
     if (xp >= LEVEL_THRESHOLDS[i]) {
@@ -78,27 +77,18 @@ const getLevelFromXP = (xp) => {
       break;
     }
   }
-  return level;
+  return Math.min(level, 10);
 };
 
 const getLevelTitle = (level) => LEVEL_TITLES[level] || 'Legend';
 
 const getXPForNextLevel = (currentLevel) => {
-  return LEVEL_THRESHOLDS[currentLevel] || null; // null = max level
+  if (currentLevel >= 10) return LEVEL_THRESHOLDS[9];
+  return LEVEL_THRESHOLDS[currentLevel] || LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
 };
 
-// ─── حساب XP من الإحصائيات ───────────────────────────────────────────────────
-/**
- * @param {Object} stats
- * @param {number} stats.completedPlans      - خطط مكتملة (progress = 100)
- * @param {number} stats.totalProgressLogs   - عدد سجلات التقدم
- * @param {number} stats.totalPlanComments   - تعليقات المدرب على الخطط
- * @param {number} stats.numberOfRatedPlans  - خطط حصلت على تقييم
- * @param {number} stats.receivedLikes       - إعجابات على المنشورات
- * @param {number} stats.receivedComments    - تعليقات على المنشورات
- * @param {number} stats.completedExercises  - إجمالي التمارين المكتملة
- */
-const calculateXP = (stats) => {
+// ─── حساب XP ديناميكي دقيق وشامل ──────────────────────────────────────────────
+const calculateXP = (stats = {}) => {
   const {
     completedPlans      = 0,
     totalProgressLogs   = 0,
@@ -107,29 +97,27 @@ const calculateXP = (stats) => {
     receivedLikes       = 0,
     receivedComments    = 0,
     completedExercises  = 0,
+    createdPosts        = 0, // 🔥 عدد المنشورات المنشورة (10 XP)
+    givenLikes          = 0, // 🔥 عدد الإعجابات التي وضعها (2 XP)
+    writtenComments     = 0, // 🔥 عدد التعليقات المكتوبة (5 XP)
   } = stats;
 
   return (
-    completedExercises  * 10  +   // كل تمرين مكتمل
-    completedPlans      * 50  +   // كل خطة مكتملة
-    totalProgressLogs   * 5   +   // كل سجل تقدم
-    totalPlanComments   * 5   +   // تعليقات المدرب
-    numberOfRatedPlans  * 10  +   // خطط مُقيَّمة
-    receivedLikes       * 2   +   // إعجابات
-    receivedComments    * 3       // تعليقات
+    completedExercises  * 15 +   // 15 XP لكل تمرين منفذ
+    completedPlans      * 80 +   // 80 XP لكل خطة مكتملة
+    totalProgressLogs   * 15 +   // 15 XP لكل تسجيل تقدم يومي
+    totalPlanComments   * 10 +   // 10 XP لملاحظات الكوتش
+    numberOfRatedPlans  * 20 +   // 20 XP عند تقييم الخطة
+    receivedLikes       * 10 +   // 10 XP لكل لايك مستلم بالمنتدى
+    receivedComments    * 15 +   // 15 XP لكل تعليق مستلم بالمنتدى
+    createdPosts        * 10 +   // 🔥 10 XP لكل منشور مكتوب
+    givenLikes          * 2  +   // 🔥 2 XP لكل لايك يعطيه
+    writtenComments     * 5      // 🔥 5 XP لكل تعليق يكتبه
   );
 };
 
 // ─── تحديد الشارات المستحقة ───────────────────────────────────────────────────
-/**
- * @param {Object} stats — نفس object الـ calculateXP + حقول إضافية
- * @param {number} stats.level               - المستوى الحالي
- * @param {number} stats.completedExercises  - إجمالي التمارين المكتملة
- * @param {number} stats.averageProgress     - متوسط التقدم (0-100)
- * @param {number} stats.completedPlans
- * @param {boolean} stats.hasMaxRating       - هل عنده تقييم 5 نجوم
- */
-const getEarnedBadges = (stats) => {
+const getEarnedBadges = (stats = {}) => {
   const {
     level              = 1,
     completedExercises = 0,
@@ -147,7 +135,7 @@ const getEarnedBadges = (stats) => {
   if (completedPlans     >= 5)   earned.push(BADGES.DEDICATED);
   if (level              >= 5)   earned.push(BADGES.RISING_STAR);
   if (level              >= 10)  earned.push(BADGES.ELITE);
-  if (hasMaxRating)               earned.push(BADGES.COACHES_PICK);
+  if (hasMaxRating)              earned.push(BADGES.COACHES_PICK);
   if (totalProgressLogs  >= 3)   earned.push(BADGES.CONSISTENT_ATHLETE);
 
   return earned;

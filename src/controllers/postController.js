@@ -1,16 +1,34 @@
 const Post = require('../models/Post');
 const Comment = require('../models/Comment');
 const Sport = require('../models/Sport');
+const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const logger = require('../utils/logger');
 const { success, error } = require('../utils/responseService');
 const { createLog } = require('../utils/ActivityLog');
 const { createNotification } = require('../utils/notificationService');
 
+// دالة مساعدة لتحديث XP والمستوى مباشرة
+const addXPToUser = async (userId, amount) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user) return;
+
+    // تحديث الـ XP
+    user.xp = Math.max(0, (user.xp || 0) + amount);
+
+    // حساب المستودع/المستوى تلقائياً بناءً على الـ XP (كل 100 XP تساوي مستوى)
+    user.level = Math.floor(user.xp / 100) + 1;
+
+    await user.save();
+    console.log(`✅ XP updated for user ${userId}: New XP = ${user.xp}, Level = ${user.level}`);
+  } catch (err) {
+    console.error('❌ Error updating XP:', err);
+  }
+};
+
 class PostController {
 
-  // GET /api/posts?sport=slug&page=1&limit=10&sort=latest
-  // Public — جلب المنشورات مع فلترة وصفحات
   getPosts = asyncHandler(async (req, res) => {
     const { sport: sportSlug, page = 1, limit = 10, sort = 'latest' } = req.query;
 
@@ -50,8 +68,6 @@ class PostController {
     return res.status(resp.status).json(resp);
   });
 
-  // GET /api/posts/:id
-  // Public — جلب منشور وحدة + زيادة الـ views
   getPostById = asyncHandler(async (req, res) => {
     const post = await Post.findOne({ _id: req.params.id, isActive: true })
       .populate('author', 'name avatar')
@@ -63,15 +79,12 @@ class PostController {
       return res.status(resp.status).json(resp);
     }
 
-    // زيادة الـ views
     await Post.updateOne({ _id: post._id }, { $inc: { views: 1 } });
 
     const resp = success(post, 'Post fetched successfully');
     return res.status(resp.status).json(resp);
   });
 
-  // GET /api/posts/sport/:sportId
-  // Public — جلب المنشورات التابعة لرياضة محددة
   getPostsBySport = asyncHandler(async (req, res) => {
     const { sportId } = req.params;
     const { page = 1, limit = 10, sort = 'latest' } = req.query;
@@ -108,8 +121,6 @@ class PostController {
     return res.status(resp.status).json(resp);
   });
 
-  // POST /api/posts
-  // User + Publisher — إنشاء منشور
   createPost = asyncHandler(async (req, res) => {
     const { title, body, sportId, media } = req.body;
 
@@ -128,25 +139,26 @@ class PostController {
       title,
       body,
       sport: sport._id,
-      author: req.user.id,
+      author: req.user._id || req.user.id,
       media: media || [],
     });
 
+    // 🔥 زيادة 10 XP لمنشئ المنشور
+    await addXPToUser(req.user._id || req.user.id, 10);
+
     await createLog({
-      userId: req.user.id,
+      userId: req.user._id || req.user.id,
       role: req.user.role,
       action: 'CREATE_POST',
       details: `Post created: ${post.title}`,
     });
 
-    logger.info('Post created', { postId: post._id, userId: req.user.id });
+    logger.info('Post created', { postId: post._id, userId: req.user._id || req.user.id });
 
     const resp = success(post, 'Post created successfully');
     return res.status(201).json({ ...resp, status: 201 });
   });
 
-  // PUT /api/posts/:id
-  // صاحب المنشور فقط
   updatePost = asyncHandler(async (req, res) => {
     const post = await Post.findOne({ _id: req.params.id, isActive: true });
 
@@ -155,7 +167,8 @@ class PostController {
       return res.status(resp.status).json(resp);
     }
 
-    if (post.author.toString() !== req.user.id.toString()) {
+    const currentUserId = (req.user._id || req.user.id).toString();
+    if (post.author.toString() !== currentUserId) {
       const resp = error('You are not authorized to update this post', 403);
       return res.status(resp.status).json(resp);
     }
@@ -169,7 +182,7 @@ class PostController {
     await post.save();
 
     await createLog({
-      userId: req.user.id,
+      userId: currentUserId,
       role: req.user.role,
       action: 'UPDATE_POST',
       details: `Post updated: ${post.title}`,
@@ -179,8 +192,6 @@ class PostController {
     return res.status(resp.status).json(resp);
   });
 
-  // DELETE /api/posts/:id
-  // صاحبه أو Admin — Hard delete
   deletePost = asyncHandler(async (req, res) => {
     const post = await Post.findById(req.params.id);
 
@@ -189,7 +200,8 @@ class PostController {
       return res.status(resp.status).json(resp);
     }
 
-    const isOwner = post.author.toString() === req.user.id.toString();
+    const currentUserId = (req.user._id || req.user.id).toString();
+    const isOwner = post.author.toString() === currentUserId;
     const isAdmin = req.user.role === 'admin';
 
     if (!isOwner && !isAdmin) {
@@ -199,8 +211,11 @@ class PostController {
 
     await Post.deleteOne({ _id: req.params.id });
 
+    // 🔥 خصم 10 XP عند حذف المنشور
+    await addXPToUser(post.author, -10);
+
     await createLog({
-      userId: req.user.id,
+      userId: currentUserId,
       role: req.user.role,
       action: 'DELETE_POST',
       details: `Post deleted: ${post.title}`,
@@ -211,7 +226,6 @@ class PostController {
   });
 
   // POST /api/posts/:id/like
-  // User مسجل — إضافة لايك
   likePost = asyncHandler(async (req, res) => {
     const post = await Post.findOne({ _id: req.params.id, isActive: true });
 
@@ -220,16 +234,22 @@ class PostController {
       return res.status(resp.status).json(resp);
     }
 
-    const alreadyLiked = post.likes.includes(req.user.id);
+    const currentUserId = (req.user._id || req.user.id).toString();
+    const alreadyLiked = post.likes.some((id) => id.toString() === currentUserId);
+
     if (alreadyLiked) {
       const resp = error('You already liked this post', 400);
       return res.status(resp.status).json(resp);
     }
 
-    post.likes.push(req.user.id);
+    post.likes.push(currentUserId);
     await post.save();
 
-    if (post.author.toString() !== req.user.id.toString()) {
+    // 🔥 إضافة 2 XP للشخص الذي أضاف اللايك
+    await addXPToUser(currentUserId, 2);
+
+    // إرسال notification لصاحب البوست
+    if (post.author.toString() !== currentUserId) {
       await createNotification({
         userId: post.author,
         type: 'POST_LIKED',
@@ -244,7 +264,6 @@ class PostController {
   });
 
   // DELETE /api/posts/:id/like
-  // User مسجل — إلغاء لايك
   unlikePost = asyncHandler(async (req, res) => {
     const post = await Post.findOne({ _id: req.params.id, isActive: true });
 
@@ -253,14 +272,19 @@ class PostController {
       return res.status(resp.status).json(resp);
     }
 
-    const alreadyLiked = post.likes.includes(req.user.id);
+    const currentUserId = (req.user._id || req.user.id).toString();
+    const alreadyLiked = post.likes.some((id) => id.toString() === currentUserId);
+
     if (!alreadyLiked) {
       const resp = error('You have not liked this post', 400);
       return res.status(resp.status).json(resp);
     }
 
-    post.likes = post.likes.filter((id) => id.toString() !== req.user.id.toString());
+    post.likes = post.likes.filter((id) => id.toString() !== currentUserId);
     await post.save();
+
+    // 🔥 خصم 2 XP من الشخص الذي أزال اللايك
+    await addXPToUser(currentUserId, -2);
 
     const resp = success({ likesCount: post.likes.length }, 'Post unliked');
     return res.status(resp.status).json(resp);
@@ -268,8 +292,6 @@ class PostController {
 
   // ─── Comments ───────────────────────────────────────────────────────────
 
-  // GET /api/posts/:id/comments
-  // Public
   getComments = asyncHandler(async (req, res) => {
     const post = await Post.findOne({ _id: req.params.id, isActive: true });
     if (!post) {
@@ -287,7 +309,6 @@ class PostController {
   });
 
   // POST /api/posts/:id/comments
-  // User مسجل
   addComment = asyncHandler(async (req, res) => {
     const post = await Post.findOne({ _id: req.params.id, isActive: true });
     if (!post) {
@@ -295,13 +316,19 @@ class PostController {
       return res.status(resp.status).json(resp);
     }
 
+    const currentUserId = (req.user._id || req.user.id).toString();
+
     const comment = await Comment.create({
       post: post._id,
-      author: req.user.id,
+      author: currentUserId,
       body: req.body.body,
     });
 
-    if (post.author.toString() !== req.user.id.toString()) {
+    // 🔥 إضافة 5 XP للشخص الذي أضاف التعليق
+    await addXPToUser(currentUserId, 5);
+
+    // إرسال notification لصاحب البوست
+    if (post.author.toString() !== currentUserId) {
       await createNotification({
         userId: post.author,
         type: 'POST_COMMENTED',
@@ -312,7 +339,7 @@ class PostController {
     }
 
     await createLog({
-      userId: req.user.id,
+      userId: currentUserId,
       role: req.user.role,
       action: 'ADD_COMMENT',
       details: `Comment added to post: ${post._id}`,
@@ -322,8 +349,6 @@ class PostController {
     return res.status(201).json({ ...resp, status: 201 });
   });
 
-  // PUT /api/comments/:commentId
-  // صاحب التعليق فقط
   updateComment = asyncHandler(async (req, res) => {
     const comment = await Comment.findOne({ _id: req.params.commentId, isActive: true });
 
@@ -332,7 +357,8 @@ class PostController {
       return res.status(resp.status).json(resp);
     }
 
-    if (comment.author.toString() !== req.user.id.toString()) {
+    const currentUserId = (req.user._id || req.user.id).toString();
+    if (comment.author.toString() !== currentUserId) {
       const resp = error('You are not authorized to update this comment', 403);
       return res.status(resp.status).json(resp);
     }
@@ -344,8 +370,6 @@ class PostController {
     return res.status(resp.status).json(resp);
   });
 
-  // DELETE /api/comments/:commentId
-  // صاحبه أو Admin — Soft delete
   deleteComment = asyncHandler(async (req, res) => {
     const comment = await Comment.findById(req.params.commentId);
 
@@ -354,7 +378,8 @@ class PostController {
       return res.status(resp.status).json(resp);
     }
 
-    const isOwner = comment.author.toString() === req.user.id.toString();
+    const currentUserId = (req.user._id || req.user.id).toString();
+    const isOwner = comment.author.toString() === currentUserId;
     const isAdmin = req.user.role === 'admin';
 
     if (!isOwner && !isAdmin) {
@@ -364,6 +389,9 @@ class PostController {
 
     comment.isActive = false;
     await comment.save();
+
+    // 🔥 خصم 5 XP من صاحب التعليق عند الحذف
+    await addXPToUser(comment.author, -5);
 
     const resp = success(null, 'Comment deleted successfully');
     return res.status(resp.status).json(resp);

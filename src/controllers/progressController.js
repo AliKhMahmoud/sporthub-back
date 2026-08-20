@@ -10,7 +10,6 @@ const { createLog } = require('../utils/ActivityLog');
 class ProgressController {
 
   // POST /api/progress
-  // الكوتش يسجل تقدم لمتدرب تابع له
   addProgress = asyncHandler(async (req, res) => {
     const { sportId, metric, value, note, recordedAt, userId: traineeId } = req.body;
 
@@ -19,6 +18,16 @@ class ProgressController {
     if (!sport) {
       const resp = error('Sport not found', 404);
       return res.status(resp.status).json(resp);
+    }
+
+    // 🔒 التحقق من أن الرياضة تابعة للكوتش المتصل (إلا إذا كان أدمن)
+    if (req.user.role === 'coach') {
+      const coachSportId = typeof req.user.sport === 'object' ? req.user.sport?._id : req.user.sport;
+
+      if (!coachSportId || coachSportId.toString() !== sport._id.toString()) {
+        const resp = error('You can only record progress for your assigned sport', 403);
+        return res.status(resp.status).json(resp);
+      }
     }
 
     // ✅ جلب المستخدم والتحقق
