@@ -238,3 +238,6 @@
 {"coachId":"6a82d3c58897f381092bf70b","level":"info","message":"Plan created","planId":"6a86b57cbef29e4e11fd68bc","timestamp":"2026-08-20 11:06:21"}
 {"coachId":"6a82d3c58897f381092bf70b","level":"info","message":"Plan created","planId":"6a86b59cbef29e4e11fd68bf","timestamp":"2026-08-20 11:06:52"}
 {"coachId":"6a82d3c58897f381092bf70b","level":"info","message":"Progress added","metric":"weight","timestamp":"2026-08-20 11:17:54","traineeId":"6a85df4c9aefbd0c4b67a6d9","value":77}
+{"coachId":"6a82d3c58897f381092bf70b","level":"info","message":"Progress added","metric":"weight","timestamp":"2026-08-20 11:27:07","traineeId":"6a85df4c9aefbd0c4b67a6d9","value":99}
+{"coachId":"6a82d3c58897f381092bf70b","level":"info","message":"Plan created","planId":"6a86baa4daa17d0cb046af09","timestamp":"2026-08-20 11:28:20"}
+{"coachId":"6a82d3c58897f381092bf70b","level":"info","message":"Progress added","metric":"weight","timestamp":"2026-08-20 11:28:48","traineeId":"6a85df4c9aefbd0c4b67a6d9","value":22}
